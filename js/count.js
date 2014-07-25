@@ -4,69 +4,77 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  this.Number = (function(_super) {
-    __extends(Number, _super);
+  this.Count = (function(_super) {
+    __extends(Count, _super);
 
-    function Number() {
-      _ref = Number.__super__.constructor.apply(this, arguments);
+    function Count() {
+      _ref = Count.__super__.constructor.apply(this, arguments);
       return _ref;
     }
 
-    Number.prototype.initialize = function() {
+    Count.prototype.initialize = function() {
       this.destroy();
       this.scene = this.get('scene');
       this.camera = this.get('camera');
-      this.geometry = new THREE.CubeGeometry(50, 50, 50);
-      this.material = new THREE.MeshLambertMaterial({
+      this.geometry = new THREE.TextGeometry("0", {
+        size: 40,
+        height: 5,
+        curveSegments: 30,
+        font: "helvetiker",
+        weight: "bold",
+        style: "normal",
+        bevelSize: 1,
+        bevelEnabled: true
+      });
+      THREE.GeometryUtils.center(this.geometry);
+      this.material = new THREE.MeshBasicMaterial({
         color: 0xFF0000
       });
-      return this.mesh = this._generateMesh();
+      this.mesh = this._generateMesh();
     };
 
-    Number.prototype.destroy = function() {
+    Count.prototype.destroy = function() {
       this.trigger('destroy');
       if (this.mesh) {
         this.scene.remove(this.mesh);
         this.mesh = void 0;
       }
       this.scene = this.camera = this.geometry = this.material = void 0;
-      return Number.__super__.destroy.call(this);
+      return Count.__super__.destroy.call(this);
     };
 
-    Number.prototype._generateMesh = function() {
+    Count.prototype._generateMesh = function() {
       var mesh;
       mesh = new THREE.Mesh(this.geometry, this.material);
       mesh.position.x = 0;
       mesh.position.y = 0;
-      mesh.position.z = this.camera.position.z - 100;
+      mesh.position.z = this.camera.position.z - 120;
       return mesh;
     };
 
-    Number.prototype.hide = function() {
+    Count.prototype.hide = function() {
       if (this.mesh) {
         return this.scene.remove(this.mesh);
       }
     };
 
-    Number.prototype.show = function() {
+    Count.prototype.show = function() {
       if (this.mesh) {
         return this.scene.add(this.mesh);
       }
     };
 
-    Number.prototype.update = function(progress) {
+    Count.prototype.update = function(progress) {
       var s;
       this.show();
       if (this.mesh) {
-        this.mesh.position.z = this.camera.position.z - 100 - 40 * progress;
-        this.mesh.rotation.x += progress * -0.02;
-        this.mesh.rotation.y += progress * 0.01;
-        s = Math.sin(progress * Math.PI);
+        this.mesh.rotation.y = Math.PI / 2 - Math.sin(progress * Math.PI) * Math.PI * 0.5;
+        s = 4.6 - Math.sin(progress * Math.PI) * 3;
         return this.mesh.scale = new THREE.Vector3(s, s, s);
       }
     };
 
-    return Number;
+    return Count;
 
   })(Backbone.Model);
 

@@ -35,7 +35,7 @@
         return this.timer.setPaused(paused);
       }), this);
       this.timer = new Timer({
-        duration: 10000
+        duration: 2000
       });
       this.timer.start();
       this.timer.on('change:progress', (function(timer, progress, obj) {
@@ -71,22 +71,19 @@
       this.camera_operator = new CameraOperator({
         camera: this.camera,
         scene: this.scene,
-        speed: 3,
-        rotation_speed: 0.01
+        speed: 0,
+        rotation_speed: 0.0
       });
-      this.on('update', (function() {
-        return this.camera_operator.update();
-      }), this);
-      this.number = new Number({
+      this.count = new Count({
         scene: this.scene,
         camera: this.camera
       });
       this.timer.on('change:progress', function(timer, progress, obj) {
-        if (progress < 0.3 || progress > 0.8) {
-          _this.number.hide();
+        if (progress > 2.5) {
+          _this.count.hide();
           return;
         }
-        return _this.number.update((progress - 0.3) / (0.8 - 0.3));
+        return _this.count.update(progress);
       });
       return this.scene;
     };
