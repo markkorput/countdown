@@ -4,15 +4,15 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  this.Astroid = (function(_super) {
-    __extends(Astroid, _super);
+  this.Number = (function(_super) {
+    __extends(Number, _super);
 
-    function Astroid() {
-      _ref = Astroid.__super__.constructor.apply(this, arguments);
+    function Number() {
+      _ref = Number.__super__.constructor.apply(this, arguments);
       return _ref;
     }
 
-    Astroid.prototype.initialize = function() {
+    Number.prototype.initialize = function() {
       this.destroy();
       this.scene = this.get('scene');
       this.camera = this.get('camera');
@@ -23,17 +23,17 @@
       return this.mesh = this._generateMesh();
     };
 
-    Astroid.prototype.destroy = function() {
+    Number.prototype.destroy = function() {
       this.trigger('destroy');
       if (this.mesh) {
         this.scene.remove(this.mesh);
         this.mesh = void 0;
       }
       this.scene = this.camera = this.geometry = this.material = void 0;
-      return Astroid.__super__.destroy.call(this);
+      return Number.__super__.destroy.call(this);
     };
 
-    Astroid.prototype._generateMesh = function() {
+    Number.prototype._generateMesh = function() {
       var mesh;
       mesh = new THREE.Mesh(this.geometry, this.material);
       mesh.position.x = 0;
@@ -42,19 +42,19 @@
       return mesh;
     };
 
-    Astroid.prototype.hide = function() {
+    Number.prototype.hide = function() {
       if (this.mesh) {
         return this.scene.remove(this.mesh);
       }
     };
 
-    Astroid.prototype.show = function() {
+    Number.prototype.show = function() {
       if (this.mesh) {
         return this.scene.add(this.mesh);
       }
     };
 
-    Astroid.prototype.update = function(progress) {
+    Number.prototype.update = function(progress) {
       var s;
       this.show();
       if (this.mesh) {
@@ -66,7 +66,7 @@
       }
     };
 
-    return Astroid;
+    return Number;
 
   })(Backbone.Model);
 

@@ -1,4 +1,4 @@
-class @Astroid extends Backbone.Model
+class @Number extends Backbone.Model
   initialize: ->
     @destroy()
     @scene = @get('scene')

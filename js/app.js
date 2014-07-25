@@ -35,7 +35,7 @@
         return this.timer.setPaused(paused);
       }), this);
       this.timer = new Timer({
-        duration: 3000
+        duration: 10000
       });
       this.timer.start();
       this.timer.on('change:progress', (function(timer, progress, obj) {
@@ -68,14 +68,6 @@
     App.prototype._createScene = function() {
       var _this = this;
       this.scene = new THREE.Scene();
-      this.dripper = new Dripper({
-        scene: this.scene,
-        camera: this.camera,
-        drip_delay: 30
-      });
-      this.on('update', (function() {
-        return this.dripper.update();
-      }), this);
       this.camera_operator = new CameraOperator({
         camera: this.camera,
         scene: this.scene,
@@ -85,24 +77,16 @@
       this.on('update', (function() {
         return this.camera_operator.update();
       }), this);
-      this.post_processor = new PostProcessor({
-        renderer: this.renderer,
-        camera: this.camera,
-        scene: this.scene
-      });
-      this.on('update', (function() {
-        return this.post_processor.update();
-      }), this);
-      this.astroid = new Astroid({
+      this.number = new Number({
         scene: this.scene,
         camera: this.camera
       });
       this.timer.on('change:progress', function(timer, progress, obj) {
         if (progress < 0.3 || progress > 0.8) {
-          _this.astroid.hide();
+          _this.number.hide();
           return;
         }
-        return _this.astroid.update((progress - 0.3) / (0.8 - 0.3));
+        return _this.number.update((progress - 0.3) / (0.8 - 0.3));
       });
       return this.scene;
     };

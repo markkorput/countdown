@@ -10,7 +10,7 @@ class @App extends Backbone.Model
 
 		@on 'change:paused', ((app, paused, obj) -> @timer.setPaused(paused)), this
 
-		@timer = new Timer(duration: 3000)		
+		@timer = new Timer(duration: 10000)
 		@timer.start()
 		@timer.on 'change:progress', ((timer, progress, obj) -> @controls.data.timeline = progress * 100), this
 		@on 'update', @timer.update, @timer
@@ -45,25 +45,21 @@ class @App extends Backbone.Model
 	_createScene: ->
 		@scene = new THREE.Scene()
 
-		@dripper = new Dripper(scene: @scene, camera: @camera, drip_delay: 30)
-		@on 'update', (-> @dripper.update()), this
-
 		@camera_operator = new CameraOperator(camera: @camera, scene: @scene, speed: 3, rotation_speed: 0.01)
 		@on 'update', (-> @camera_operator.update()), this
 
-		@post_processor = new PostProcessor(renderer: @renderer, camera: @camera, scene: @scene)
-		@on 'update', (-> @post_processor.update()), this
+		# @post_processor = new PostProcessor(renderer: @renderer, camera: @camera, scene: @scene)
+		# @on 'update', (-> @post_processor.update()), this
 
 		# create astroid; a timer-managed animation object
-		@astroid = new Astroid(scene: @scene, camera: @camera)
+		@number = new Number(scene: @scene, camera: @camera)
 		# controlled by timeline; an animation that shows between 0.3 and 0.8
 		@timer.on 'change:progress', (timer, progress, obj) =>
 			if progress < 0.3 || progress > 0.8
-				@astroid.hide()
+				@number.hide()
 				return
 
-			@astroid.update((progress - 0.3) / (0.8-0.3))
-
+			@number.update((progress - 0.3) / (0.8-0.3))
 
 		return @scene
 
