@@ -65,15 +65,23 @@
     };
 
     Count.prototype.update = function(progress) {
-      var p, s;
-      this.show();
-      if (this.mesh) {
-        p = Math.sin(progress * Math.PI / 2);
-        this.mesh.rotation.y = Math.PI / 2 - Math.sin(progress * Math.PI) * Math.PI * 0.5;
-        this.mesh.rotation.z = Math.PI / 2 - Math.sin(progress * Math.PI) * Math.PI * 0.5;
-        s = 5 - Math.sin(p * Math.PI) * 4;
-        return this.mesh.scale = new THREE.Vector3(s, s, s);
+      var p, r, s;
+      if (!this.mesh) {
+        return;
       }
+      this.show();
+      if (progress < 0.1 || progress > 0.9) {
+        p = progress;
+        r = Math.PI * 0.5;
+        s = 5;
+      } else {
+        p = (progress - 0.1) / 0.8;
+        r = Math.PI / 2 - Math.sin(p * Math.PI) * Math.PI * 0.5;
+        s = 5 - Math.sin(p * Math.PI) * 4;
+      }
+      this.mesh.rotation.y = r;
+      this.mesh.rotation.z = r;
+      return this.mesh.scale = new THREE.Vector3(s, s, s);
     };
 
     return Count;

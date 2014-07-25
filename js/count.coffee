@@ -46,14 +46,24 @@ class @Count extends Backbone.Model
 
   # progress should be a number between 0.0 and 1.0 (but this is not really necessary)
   update: (progress) ->
+    return if !@mesh
     @show()
-    if @mesh
-      p = Math.sin(progress * Math.PI/2)
-      @mesh.rotation.y = Math.PI/2 - Math.sin(progress * Math.PI) * Math.PI*0.5
-      @mesh.rotation.z = Math.PI/2 - Math.sin(progress * Math.PI) * Math.PI*0.5
+
+    if progress < 0.1 || progress > 0.9
+      p = progress
+      r = Math.PI * 0.5
+      s = 5
+    else
+      # p = Math.sin(progress * Math.PI/2)
+      p = (progress - 0.1) / 0.8
+      r = Math.PI/2 - Math.sin(p * Math.PI) * Math.PI*0.5
       s = 5 - Math.sin(p * Math.PI) * 4
-      # s = 2.5 + Math.abs((progress - 0.5)) * 2.5
-      @mesh.scale = new THREE.Vector3(s,s,s)
+      # s = 2.5 + Math.abs((p - 0.5)) * 2.5
+
+    @mesh.rotation.y = r
+    @mesh.rotation.z = r
+    @mesh.scale = new THREE.Vector3(s,s,s)
+
 
 
 
