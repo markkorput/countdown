@@ -65,11 +65,13 @@
     };
 
     Count.prototype.update = function(progress) {
-      var s;
+      var p, s;
       this.show();
       if (this.mesh) {
+        p = Math.sin(progress * Math.PI / 2);
         this.mesh.rotation.y = Math.PI / 2 - Math.sin(progress * Math.PI) * Math.PI * 0.5;
-        s = 4.6 - Math.sin(progress * Math.PI) * 3;
+        this.mesh.rotation.z = Math.PI / 2 - Math.sin(progress * Math.PI) * Math.PI * 0.5;
+        s = 5 - Math.sin(p * Math.PI) * 4;
         return this.mesh.scale = new THREE.Vector3(s, s, s);
       }
     };

@@ -48,8 +48,11 @@ class @Count extends Backbone.Model
   update: (progress) ->
     @show()
     if @mesh
+      p = Math.sin(progress * Math.PI/2)
       @mesh.rotation.y = Math.PI/2 - Math.sin(progress * Math.PI) * Math.PI*0.5
-      s = 4.6 - Math.sin(progress * Math.PI) * 3
+      @mesh.rotation.z = Math.PI/2 - Math.sin(progress * Math.PI) * Math.PI*0.5
+      s = 5 - Math.sin(p * Math.PI) * 4
+      # s = 2.5 + Math.abs((progress - 0.5)) * 2.5
       @mesh.scale = new THREE.Vector3(s,s,s)
 
 
