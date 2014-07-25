@@ -35,7 +35,7 @@
         return this.timer.setPaused(paused);
       }), this);
       this.timer = new Timer({
-        duration: 2000
+        duration: 10000
       });
       this.timer.start();
       this.timer.on('change:progress', (function(timer, progress, obj) {
@@ -74,16 +74,21 @@
         speed: 0,
         rotation_speed: 0.0
       });
-      this.count = new Count({
-        scene: this.scene,
-        camera: this.camera
+      this.counts = _.map(_.range(10), function(number, idx, list) {
+        return new Count({
+          scene: _this.scene,
+          camera: _this.camera,
+          text: number
+        });
       });
       this.timer.on('change:progress', function(timer, progress, obj) {
-        if (progress > 2.5) {
-          _this.count.hide();
-          return;
-        }
-        return _this.count.update(progress);
+        var count, idx;
+        _.each(_this.counts, function(count) {
+          return count.hide();
+        });
+        idx = parseInt(progress * 10);
+        count = _this.counts[idx];
+        return count.update((progress - 0.1 * idx) / 0.1);
       });
       return this.scene;
     };

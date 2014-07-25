@@ -10,7 +10,7 @@ class @App extends Backbone.Model
 
 		@on 'change:paused', ((app, paused, obj) -> @timer.setPaused(paused)), this
 
-		@timer = new Timer(duration: 2000)
+		@timer = new Timer(duration: 10000)
 		@timer.start()
 		@timer.on 'change:progress', ((timer, progress, obj) -> @controls.data.timeline = progress * 100), this
 		@on 'update', @timer.update, @timer
@@ -51,15 +51,19 @@ class @App extends Backbone.Model
 		# @post_processor = new PostProcessor(renderer: @renderer, camera: @camera, scene: @scene)
 		# @on 'update', (-> @post_processor.update()), this
 
-		# create astroid; a timer-managed animation object
-		@count = new Count(scene: @scene, camera: @camera)
-		# controlled by timeline; an animation that shows between 0.3 and 0.8
-		@timer.on 'change:progress', (timer, progress, obj) =>
-			if progress > 2.5
-				@count.hide()
-				return
+		@counts =	_.map _.range(10), (number, idx, list) =>
+			# create count animation
+			new Count(scene: @scene, camera: @camera, text: number)
 
-			@count.update(progress)
+		@timer.on 'change:progress', (timer, progress, obj) =>
+			# hide all count numbers
+			_.each @counts, (count) -> count.hide()
+			# get index of current visible number
+			idx = parseInt(progress*10)
+			# get count object of current number
+			count = @counts[idx]
+			# update current number
+			count.update((progress - 0.1 * idx) / 0.1)
 
 		return @scene
 

@@ -5,7 +5,7 @@ class @Count extends Backbone.Model
     @camera = @get('camera')
 
     # @geometry = new THREE.CubeGeometry 50, 50, 50
-    @geometry = new THREE.TextGeometry("0", {
+    @geometry = new THREE.TextGeometry(''+(@get('text') || 0), {
       size: 40,
       height: 5,
       curveSegments: 30,

@@ -16,7 +16,7 @@
       this.destroy();
       this.scene = this.get('scene');
       this.camera = this.get('camera');
-      this.geometry = new THREE.TextGeometry("0", {
+      this.geometry = new THREE.TextGeometry('' + (this.get('text') || 0), {
         size: 40,
         height: 5,
         curveSegments: 30,
