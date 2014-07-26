@@ -31,6 +31,14 @@
         color: 0xFF0000
       });
       this.mesh = this._generateMesh();
+      this.sourceRotation = Math.PI * 0.5;
+      this.deltaRotation = Math.PI * -0.5;
+      if (Math.random() > 0.5) {
+        this.sourceRotation = this.sourceRotation * -1;
+        this.deltaRotation = this.deltaRotation * -1;
+      }
+      this.sourceScale = 5;
+      return this.deltaScale = -4;
     };
 
     Count.prototype.destroy = function() {
@@ -72,12 +80,12 @@
       this.show();
       if (progress < 0.1 || progress > 0.9) {
         p = progress;
-        r = Math.PI * 0.5;
-        s = 5;
+        r = this.sourceRotation;
+        s = this.sourceScale;
       } else {
         p = (progress - 0.1) / 0.8;
-        r = Math.PI / 2 - Math.sin(p * Math.PI) * Math.PI * 0.5;
-        s = 5 - Math.sin(p * Math.PI) * 4;
+        r = this.sourceRotation + Math.sin(p * Math.PI) * this.deltaRotation;
+        s = this.sourceScale + Math.sin(p * Math.PI) * this.deltaScale;
       }
       this.mesh.rotation.y = r;
       this.mesh.rotation.z = r;

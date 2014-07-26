@@ -21,7 +21,14 @@ class @Count extends Backbone.Model
     # @material = new THREE.MeshLambertMaterial({color: 0xFF0000 })
     @material = new THREE.MeshBasicMaterial({color: 0xFF0000 })
     @mesh = @_generateMesh()
-    return
+
+    @sourceRotation = Math.PI*0.5
+    @deltaRotation = Math.PI*-0.5
+    if Math.random() > 0.5
+      @sourceRotation = @sourceRotation * -1
+      @deltaRotation = @deltaRotation * -1
+    @sourceScale = 5
+    @deltaScale = -4
 
   destroy: ->
     @trigger 'destroy'
@@ -51,13 +58,13 @@ class @Count extends Backbone.Model
 
     if progress < 0.1 || progress > 0.9
       p = progress
-      r = Math.PI * 0.5
-      s = 5
+      r = @sourceRotation
+      s = @sourceScale
     else
       # p = Math.sin(progress * Math.PI/2)
       p = (progress - 0.1) / 0.8
-      r = Math.PI/2 - Math.sin(p * Math.PI) * Math.PI*0.5
-      s = 5 - Math.sin(p * Math.PI) * 4
+      r = @sourceRotation + Math.sin(p * Math.PI) * @deltaRotation
+      s = @sourceScale + Math.sin(p * Math.PI) * @deltaScale
       # s = 2.5 + Math.abs((p - 0.5)) * 2.5
 
     @mesh.rotation.y = r
