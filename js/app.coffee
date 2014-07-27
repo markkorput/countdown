@@ -60,22 +60,8 @@ class @App extends Backbone.Model
 				t = 0.0
 			@post_processor.update(blindsProgress: t)
 
-		@counts =	_.map _.range(10), (number, idx, list) =>
-			# create count animation
-			new Count(scene: @scene, camera: @camera, text: number)
-
-		@timer.on 'change:progress', (timer, progress, obj) =>
-			# get index of current visible number
-			idx = parseInt(progress*10)
-
-			# hide all count numbers
-			_.each @counts, (count, i) -> count.hide() if i != idx
-
-			# get count object of current number
-			count = @counts[idx]
-
-			# update current number
-			count.show((progress - 0.1 * idx) / 0.1)
+		@counter = new Counter(scene: @scene, camera: @camera)
+		@timer.on 'change:progress', ((timer, progress, obj) -> @counter.update(progress)), this
 
 		return @scene
 

@@ -93,24 +93,13 @@
           blindsProgress: t
         });
       });
-      this.counts = _.map(_.range(10), function(number, idx, list) {
-        return new Count({
-          scene: _this.scene,
-          camera: _this.camera,
-          text: number
-        });
+      this.counter = new Counter({
+        scene: this.scene,
+        camera: this.camera
       });
-      this.timer.on('change:progress', function(timer, progress, obj) {
-        var count, idx;
-        idx = parseInt(progress * 10);
-        _.each(_this.counts, function(count, i) {
-          if (i !== idx) {
-            return count.hide();
-          }
-        });
-        count = _this.counts[idx];
-        return count.show((progress - 0.1 * idx) / 0.1);
-      });
+      this.timer.on('change:progress', (function(timer, progress, obj) {
+        return this.counter.update(progress);
+      }), this);
       return this.scene;
     };
 
