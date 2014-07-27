@@ -51,7 +51,14 @@ class @App extends Backbone.Model
 		@post_processor = new PostProcessor(renderer: @renderer, camera: @camera, scene: @scene)
 		# @on 'update', (-> @post_processor.update()), this
 		@timer.on 'change:progress', (model, value, obj) =>
-			@post_processor.update(blindsProgress: value)
+			t = (value * 10) - parseInt(value * 10)
+			console.log t
+			if t >= 0.9
+				t -= 0.9
+				t = t / 0.1
+			else
+				t = 0.0
+			@post_processor.update(blindsProgress: t)
 
 		@counts =	_.map _.range(10), (number, idx, list) =>
 			# create count animation

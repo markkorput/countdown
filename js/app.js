@@ -80,8 +80,17 @@
         scene: this.scene
       });
       this.timer.on('change:progress', function(model, value, obj) {
+        var t;
+        t = (value * 10) - parseInt(value * 10);
+        console.log(t);
+        if (t >= 0.9) {
+          t -= 0.9;
+          t = t / 0.1;
+        } else {
+          t = 0.0;
+        }
         return _this.post_processor.update({
-          blindsProgress: value
+          blindsProgress: t
         });
       });
       this.counts = _.map(_.range(10), function(number, idx, list) {
