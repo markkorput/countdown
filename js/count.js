@@ -25,11 +25,9 @@
       this.sourceScale = 5;
       this.deltaScale = -4;
       this.on('change:shown', (function(model, value, obj) {
-        var clr;
         if (value === true) {
           if (this.mesh) {
-            clr = this.mesh.material.color.getHSL();
-            this.mesh.material.color.setHSL(Math.random(), clr.s, clr.l);
+            this._randomizeColor();
           } else {
             this.mesh = this._generateMesh();
           }
@@ -41,9 +39,7 @@
         }
       }), this);
       if (this.get('shown') === void 0) {
-        return this.set({
-          shown: false
-        });
+        return this.hide();
       }
     };
 
@@ -55,18 +51,6 @@
       }
       this.scene = this.camera = void 0;
       return Count.__super__.destroy.call(this);
-    };
-
-    Count.prototype.hide = function() {
-      return this.set({
-        shown: false
-      });
-    };
-
-    Count.prototype.show = function() {
-      return this.set({
-        shown: true
-      });
     };
 
     Count.prototype._generateGeometry = function() {
@@ -97,12 +81,31 @@
       mesh.position.x = 0;
       mesh.position.y = 0;
       mesh.position.z = this.camera.position.z - 120;
+      this._randomizeColor(mesh);
       return mesh;
     };
 
-    Count.prototype.update = function(progress) {
+    Count.prototype._randomizeColor = function(mesh) {
+      var clr;
+      mesh || (mesh = this.mesh);
+      clr = mesh.material.color.getHSL();
+      return mesh.material.color.setHSL(Math.random(), clr.s, clr.l);
+    };
+
+    Count.prototype.hide = function() {
+      return this.set({
+        shown: false
+      });
+    };
+
+    Count.prototype.show = function(progress) {
       var p, r, s;
-      this.show();
+      this.set({
+        shown: true
+      });
+      if (!this.mesh) {
+        return;
+      }
       if (progress < 0.1 || progress > 0.9) {
         p = progress;
         r = this.sourceRotation;

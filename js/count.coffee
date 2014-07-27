@@ -16,8 +16,7 @@ class @Count extends Backbone.Model
       # when the 'shown' attribute changes to true; initialize a new mesh and add it to the scene
       if value == true
         if @mesh
-          clr = @mesh.material.color.getHSL()
-          @mesh.material.color.setHSL Math.random(), clr.s, clr.l
+          @_randomizeColor()
         else
           @mesh = @_generateMesh() 
         @scene.add @mesh
@@ -28,7 +27,7 @@ class @Count extends Backbone.Model
     ), this
 
     # start with 'shown' set to false by default
-    @set(shown: false) if @get('shown') == undefined
+    @hide() if @get('shown') == undefined
 
   destroy: ->
     @trigger 'destroy'
@@ -39,9 +38,6 @@ class @Count extends Backbone.Model
 
     @scene = @camera = undefined
     super()
-
-  hide: -> @set(shown: false) 
-  show: -> @set(shown: true)
 
   _generateGeometry: ->
     # geometry = new THREE.CubeGeometry 50, 50, 50
@@ -69,12 +65,22 @@ class @Count extends Backbone.Model
     mesh.position.x = 0
     mesh.position.y = 0
     mesh.position.z = @camera.position.z - 120
+    @_randomizeColor(mesh)
     mesh
 
-  # progress should be a number between 0.0 and 1.0 (but this is not really necessary)
-  update: (progress) ->
-    @show()
+  _randomizeColor: (mesh) ->
+    mesh ||= @mesh
+    clr = mesh.material.color.getHSL()
+    mesh.material.color.setHSL Math.random(), clr.s, clr.l
 
+  hide: -> @set(shown: false) 
+  
+  # progress should be a number between 0.0 and 1.0 (but this is not really necessary)
+  show: (progress) ->
+    # an attirbute change callback will make sure the mesh is created when 'shown' changes to true
+    @set(shown: true)
+
+    return if !@mesh
     if progress < 0.1 || progress > 0.9
       p = progress
       r = @sourceRotation

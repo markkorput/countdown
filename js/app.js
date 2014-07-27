@@ -83,12 +83,14 @@
       });
       this.timer.on('change:progress', function(timer, progress, obj) {
         var count, idx;
-        _.each(_this.counts, function(count) {
-          return count.hide();
-        });
         idx = parseInt(progress * 10);
+        _.each(_this.counts, function(count, i) {
+          if (i !== idx) {
+            return count.hide();
+          }
+        });
         count = _this.counts[idx];
-        return count.update((progress - 0.1 * idx) / 0.1);
+        return count.show((progress - 0.1 * idx) / 0.1);
       });
       return this.scene;
     };

@@ -56,14 +56,17 @@ class @App extends Backbone.Model
 			new Count(scene: @scene, camera: @camera, text: number)
 
 		@timer.on 'change:progress', (timer, progress, obj) =>
-			# hide all count numbers
-			_.each @counts, (count) -> count.hide()
 			# get index of current visible number
 			idx = parseInt(progress*10)
+
+			# hide all count numbers
+			_.each @counts, (count, i) -> count.hide() if i != idx
+
 			# get count object of current number
 			count = @counts[idx]
+
 			# update current number
-			count.update((progress - 0.1 * idx) / 0.1)
+			count.show((progress - 0.1 * idx) / 0.1)
 
 		return @scene
 
