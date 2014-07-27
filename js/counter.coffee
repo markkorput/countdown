@@ -7,8 +7,10 @@ class @Counter extends Backbone.Model
       new Count(scene: @get('scene'), camera: @get('camera'), text: number)
 
   update: (progress) ->
+    @set(progress: progress)
+
     # get index of current visible number
-    idx = parseInt(progress*@amount)
+    idx = @currentIndex()
 
     # hide all count numbers
     _.each @counts, (count, i) -> count.hide() if i != idx
@@ -21,3 +23,14 @@ class @Counter extends Backbone.Model
 
     # update current number
     count.show((progress - sublength * idx) / sublength)
+
+  currentIndex: ->
+    idx = parseInt(@get('progress')*@amount)
+
+  nextIndex: ->
+    idx = @currentIndex() + 1
+    idx = 0 if idx >= @amount
+    return idx
+
+  nextColor: ->
+    @counts[@nextIndex()].getColor()

@@ -26,7 +26,10 @@
 
     Counter.prototype.update = function(progress) {
       var count, idx, sublength;
-      idx = parseInt(progress * this.amount);
+      this.set({
+        progress: progress
+      });
+      idx = this.currentIndex();
       _.each(this.counts, function(count, i) {
         if (i !== idx) {
           return count.hide();
@@ -35,6 +38,24 @@
       count = this.counts[idx];
       sublength = 1.0 / this.amount;
       return count.show((progress - sublength * idx) / sublength);
+    };
+
+    Counter.prototype.currentIndex = function() {
+      var idx;
+      return idx = parseInt(this.get('progress') * this.amount);
+    };
+
+    Counter.prototype.nextIndex = function() {
+      var idx;
+      idx = this.currentIndex() + 1;
+      if (idx >= this.amount) {
+        idx = 0;
+      }
+      return idx;
+    };
+
+    Counter.prototype.nextColor = function() {
+      return this.counts[this.nextIndex()].getColor();
     };
 
     return Counter;

@@ -79,20 +79,6 @@
         camera: this.camera,
         scene: this.scene
       });
-      this.timer.on('change:progress', function(model, value, obj) {
-        var t;
-        t = (value * 10) - parseInt(value * 10);
-        console.log(t);
-        if (t >= 0.9) {
-          t -= 0.9;
-          t = t / 0.1;
-        } else {
-          t = 0.0;
-        }
-        return _this.post_processor.update({
-          blindsProgress: t
-        });
-      });
       this.counter = new Counter({
         scene: this.scene,
         camera: this.camera
@@ -100,6 +86,22 @@
       this.timer.on('change:progress', (function(timer, progress, obj) {
         return this.counter.update(progress);
       }), this);
+      this.timer.on('change:progress', function(model, value, obj) {
+        var t;
+        t = (value * 10) - parseInt(value * 10);
+        if (t >= 0.9) {
+          t -= 0.9;
+          t = t / 0.1;
+        } else {
+          t = 0.0;
+        }
+        return _this.post_processor.update({
+          blinds: {
+            progress: t,
+            color: _this.counter.nextColor()
+          }
+        });
+      });
       return this.scene;
     };
 

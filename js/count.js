@@ -31,21 +31,29 @@
         }[value], model);
       });
       this.on('show', function(model) {
-        model.set({
+        return model.set({
           mesh: this._generateMesh()
         });
-        return model._randomizeColor();
       });
       this.on('change:mesh', function(model, value, obj) {
         if (model.scene) {
+          if (model.previous('mesh')) {
+            model.scene.remove(model.previous('mesh'));
+          }
           return model.scene.add(value);
         }
       });
       this.on('hide', function(model) {
         var m;
+        model.randomizeColor();
         if (model.scene && (m = model.get('mesh'))) {
           return model.scene.remove(m);
         }
+      });
+      this.on('change:color', function(model, value, obj) {
+        return model.set({
+          mesh: this._generateMesh()
+        });
       });
       if (this.get('shown') === void 0) {
         return this.hide();
@@ -77,7 +85,7 @@
 
     Count.prototype._generateMaterial = function() {
       return new THREE.MeshBasicMaterial({
-        color: 0xFF0000
+        color: this.getColor()
       });
     };
 
@@ -90,13 +98,28 @@
       return mesh;
     };
 
-    Count.prototype._randomizeColor = function(mesh) {
-      var clr;
-      if (!(mesh || (mesh = this.get('mesh')))) {
-        return;
+    Count.prototype._defaultColor = function() {
+      return new THREE.Color(255, 0, 0);
+    };
+
+    Count.prototype.randomizeColor = function() {
+      var clr, hsl, mesh;
+      if (this.get('color')) {
+        clr = this.get('color').clone();
       }
-      clr = mesh.material.color.getHSL();
-      return mesh.material.color.setHSL(Math.random(), clr.s, clr.l);
+      if (mesh = this.get('mesh')) {
+        clr || (clr = mesh.material.color.getHSL());
+      }
+      clr || (clr = this._defaultColor());
+      hsl = clr.getHSL();
+      clr.setHSL(Math.random(), hsl.s, hsl.l);
+      return this.set({
+        color: clr
+      });
+    };
+
+    Count.prototype.getColor = function() {
+      return this.get('color') || this._defaultColor();
     };
 
     Count.prototype.hide = function() {

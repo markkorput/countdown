@@ -23,16 +23,22 @@ class @Count extends Backbone.Model
     # make sure we have a mesh when being shown
     @on 'show', (model) ->
       model.set(mesh: @_generateMesh()) 
-      model._randomizeColor()
 
     # when we get a new mesh; add it to the scene
     @on 'change:mesh', (model, value, obj) ->
-      model.scene.add value if model.scene
+      if model.scene
+        model.scene.remove model.previous('mesh') if model.previous('mesh')
+        model.scene.add value 
 
     # remove mesh from scene when hiding
     @on 'hide', (model) ->
+      model.randomizeColor()
+
       if model.scene && m = model.get('mesh')
         model.scene.remove m
+
+    @on 'change:color', (model, value, obj) ->
+      model.set(mesh: @_generateMesh())
 
     # start hidden by default
     @hide() if @get('shown') == undefined
@@ -61,8 +67,9 @@ class @Count extends Backbone.Model
     return geometry
 
   _generateMaterial: ->
-    # @material = new THREE.MeshLambertMaterial({color: 0xFF0000 })
-    new THREE.MeshBasicMaterial({color: 0xFF0000 })
+
+    # @material = new THREE.MeshLambertMaterial({color: @get('color') || @_defaultColor()})
+    new THREE.MeshBasicMaterial({color: @getColor()})
 
   _generateMesh: ->
     mesh = new THREE.Mesh( @geometry || @_generateGeometry(), @material || @_generateMaterial() )
@@ -71,10 +78,17 @@ class @Count extends Backbone.Model
     mesh.position.z = @camera.position.z - 120
     mesh
 
-  _randomizeColor: (mesh) ->
-    return if !(mesh ||= @get('mesh'))
-    clr = mesh.material.color.getHSL()
-    mesh.material.color.setHSL Math.random(), clr.s, clr.l
+  _defaultColor: -> new THREE.Color(255, 0, 0)
+
+  randomizeColor: ->
+    clr = @get('color').clone() if @get('color')
+    clr ||= mesh.material.color.getHSL() if mesh = @get('mesh')
+    clr ||= @_defaultColor()
+    hsl = clr.getHSL()
+    clr.setHSL Math.random(), hsl.s, hsl.l
+    @set(color: clr)
+
+  getColor: -> @get('color') || @_defaultColor()
 
   hide: -> @set(shown: false) 
   

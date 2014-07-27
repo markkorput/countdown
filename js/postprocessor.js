@@ -22,7 +22,9 @@
       this.blindsEffect.renderToScreen = true;
       this.composer.addPass(this.blindsEffect);
       return this.on('update', function(model, opts) {
-        return model.blindsEffect.uniforms.progress.value = (opts || {}).blindsProgress || 0.0;
+        opts = opts.blinds || {};
+        model.blindsEffect.uniforms.progress.value = opts.progress || 0.0;
+        return model.blindsEffect.uniforms.color.value = opts.color || new THREE.Color(1.0, 0.0, 0.0);
       });
     };
 

@@ -30,7 +30,9 @@ class @PostProcessor extends Backbone.Model
     @blindsEffect.renderToScreen = true
     @composer.addPass @blindsEffect
     @on 'update', (model, opts) ->
-        model.blindsEffect.uniforms.progress.value = (opts || {}).blindsProgress || 0.0
+        opts = opts.blinds || {}
+        model.blindsEffect.uniforms.progress.value = opts.progress || 0.0
+        model.blindsEffect.uniforms.color.value = opts.color || new THREE.Color(1.0, 0.0, 0.0)
 
   destroy: ->
     @trigger 'destroy'
@@ -39,6 +41,7 @@ class @PostProcessor extends Backbone.Model
       @composer = undefined
 
     @dotScreenEffect = @rgbShiftEffect = @scene = @camera = undefined
+
   update: (opts) ->
     @frame ||= 0
     @trigger 'update', this, opts

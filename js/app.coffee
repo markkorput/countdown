@@ -50,18 +50,22 @@ class @App extends Backbone.Model
 
 		@post_processor = new PostProcessor(renderer: @renderer, camera: @camera, scene: @scene)
 		# @on 'update', (-> @post_processor.update()), this
+
+		@counter = new Counter(scene: @scene, camera: @camera)
+		@timer.on 'change:progress', ((timer, progress, obj) -> @counter.update(progress)), this
+
+
 		@timer.on 'change:progress', (model, value, obj) =>
 			t = (value * 10) - parseInt(value * 10)
-			console.log t
+
 			if t >= 0.9
 				t -= 0.9
 				t = t / 0.1
 			else
 				t = 0.0
-			@post_processor.update(blindsProgress: t)
 
-		@counter = new Counter(scene: @scene, camera: @camera)
-		@timer.on 'change:progress', ((timer, progress, obj) -> @counter.update(progress)), this
+			@post_processor.update(blinds: {progress: t, color: @counter.nextColor()})
+
 
 		return @scene
 
