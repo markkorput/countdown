@@ -12,30 +12,34 @@ class @Count extends Backbone.Model
     @sourceScale = 5
     @deltaScale = -4
 
-    @on 'change:shown', ((model, value, obj)->
-      # when the 'shown' attribute changes to true; initialize a new mesh and add it to the scene
-      if value == true
-        if @mesh
-          @_randomizeColor()
-        else
-          @mesh = @_generateMesh() 
-        @scene.add @mesh
-        return
+    #
+    # create event hooks
+    #
 
-      # when the 'shown' attribute changes to false; remove the mesh (if one was found) from the scene
-      @scene.remove @mesh if @mesh  # && value == false
-    ), this
+    # propagate change:shown (true|false) events into 'show' and 'hide' events
+    @on 'change:shown', (model, value, obj) ->
+      model.trigger({true: 'show', false: 'hide'}[value], model)
 
-    # start with 'shown' set to false by default
+    # make sure we have a mesh when being shown
+    @on 'show', (model) ->
+      model.set(mesh: @_generateMesh()) 
+      model._randomizeColor()
+
+    # when we get a new mesh; add it to the scene
+    @on 'change:mesh', (model, value, obj) ->
+      model.scene.add value if model.scene
+
+    # remove mesh from scene when hiding
+    @on 'hide', (model) ->
+      if model.scene && m = model.get('mesh')
+        model.scene.remove m
+
+    # start hidden by default
     @hide() if @get('shown') == undefined
 
   destroy: ->
     @trigger 'destroy'
-
-    if @mesh
-      @scene.remove @mesh
-      @mesh = undefined
-
+    @hide
     @scene = @camera = undefined
     super()
 
@@ -65,11 +69,10 @@ class @Count extends Backbone.Model
     mesh.position.x = 0
     mesh.position.y = 0
     mesh.position.z = @camera.position.z - 120
-    @_randomizeColor(mesh)
     mesh
 
   _randomizeColor: (mesh) ->
-    mesh ||= @mesh
+    return if !(mesh ||= @get('mesh'))
     clr = mesh.material.color.getHSL()
     mesh.material.color.setHSL Math.random(), clr.s, clr.l
 
@@ -77,10 +80,10 @@ class @Count extends Backbone.Model
   
   # progress should be a number between 0.0 and 1.0 (but this is not really necessary)
   show: (progress) ->
-    # an attirbute change callback will make sure the mesh is created when 'shown' changes to true
+    # an attribute change callback will make sure the mesh is created when 'shown' changes to true
     @set(shown: true)
 
-    return if !@mesh
+    return if !(mesh = @get('mesh'))
     if progress < 0.1 || progress > 0.9
       p = progress
       r = @sourceRotation
@@ -92,9 +95,9 @@ class @Count extends Backbone.Model
       s = @sourceScale + Math.sin(p * Math.PI) * @deltaScale
       # s = 2.5 + Math.abs((p - 0.5)) * 2.5
 
-    @mesh.rotation.y = r
-    @mesh.rotation.z = r
-    @mesh.scale = new THREE.Vector3(s,s,s)
+    mesh.rotation.y = r
+    mesh.rotation.z = r
+    mesh.scale = new THREE.Vector3(s,s,s)
 
 
 

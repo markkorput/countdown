@@ -24,20 +24,29 @@
       }
       this.sourceScale = 5;
       this.deltaScale = -4;
-      this.on('change:shown', (function(model, value, obj) {
-        if (value === true) {
-          if (this.mesh) {
-            this._randomizeColor();
-          } else {
-            this.mesh = this._generateMesh();
-          }
-          this.scene.add(this.mesh);
-          return;
+      this.on('change:shown', function(model, value, obj) {
+        return model.trigger({
+          "true": 'show',
+          "false": 'hide'
+        }[value], model);
+      });
+      this.on('show', function(model) {
+        model.set({
+          mesh: this._generateMesh()
+        });
+        return model._randomizeColor();
+      });
+      this.on('change:mesh', function(model, value, obj) {
+        if (model.scene) {
+          return model.scene.add(value);
         }
-        if (this.mesh) {
-          return this.scene.remove(this.mesh);
+      });
+      this.on('hide', function(model) {
+        var m;
+        if (model.scene && (m = model.get('mesh'))) {
+          return model.scene.remove(m);
         }
-      }), this);
+      });
       if (this.get('shown') === void 0) {
         return this.hide();
       }
@@ -45,10 +54,7 @@
 
     Count.prototype.destroy = function() {
       this.trigger('destroy');
-      if (this.mesh) {
-        this.scene.remove(this.mesh);
-        this.mesh = void 0;
-      }
+      this.hide;
       this.scene = this.camera = void 0;
       return Count.__super__.destroy.call(this);
     };
@@ -81,13 +87,14 @@
       mesh.position.x = 0;
       mesh.position.y = 0;
       mesh.position.z = this.camera.position.z - 120;
-      this._randomizeColor(mesh);
       return mesh;
     };
 
     Count.prototype._randomizeColor = function(mesh) {
       var clr;
-      mesh || (mesh = this.mesh);
+      if (!(mesh || (mesh = this.get('mesh')))) {
+        return;
+      }
       clr = mesh.material.color.getHSL();
       return mesh.material.color.setHSL(Math.random(), clr.s, clr.l);
     };
@@ -99,11 +106,11 @@
     };
 
     Count.prototype.show = function(progress) {
-      var p, r, s;
+      var mesh, p, r, s;
       this.set({
         shown: true
       });
-      if (!this.mesh) {
+      if (!(mesh = this.get('mesh'))) {
         return;
       }
       if (progress < 0.1 || progress > 0.9) {
@@ -115,9 +122,9 @@
         r = this.sourceRotation + Math.sin(p * Math.PI) * this.deltaRotation;
         s = this.sourceScale + Math.sin(p * Math.PI) * this.deltaScale;
       }
-      this.mesh.rotation.y = r;
-      this.mesh.rotation.z = r;
-      return this.mesh.scale = new THREE.Vector3(s, s, s);
+      mesh.rotation.y = r;
+      mesh.rotation.z = r;
+      return mesh.scale = new THREE.Vector3(s, s, s);
     };
 
     return Count;
