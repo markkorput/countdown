@@ -16,7 +16,6 @@
       this.destroy();
       this.scene = this.get('scene');
       this.camera = this.get('camera');
-      this.mesh = this._generateMesh();
       this.sourceRotation = Math.PI * 0.5;
       this.deltaRotation = Math.PI * -0.5;
       if (Math.random() > 0.5) {
@@ -26,13 +25,19 @@
       this.sourceScale = 5;
       this.deltaScale = -4;
       this.on('change:shown', (function(model, value, obj) {
-        if (model.mesh && value === false) {
-          return model.scene.remove(model.mesh);
+        var clr;
+        if (value === true) {
+          if (this.mesh) {
+            clr = this.mesh.material.color.getHSL();
+            this.mesh.material.color.setHSL(Math.random(), clr.s, clr.l);
+          } else {
+            this.mesh = this._generateMesh();
+          }
+          this.scene.add(this.mesh);
+          return;
         }
-      }), this);
-      this.on('change:shown', (function(model, value, obj) {
-        if (model.mesh && value === true) {
-          return model.scene.add(model.mesh);
+        if (this.mesh) {
+          return this.scene.remove(this.mesh);
         }
       }), this);
       if (this.get('shown') === void 0) {
@@ -97,9 +102,6 @@
 
     Count.prototype.update = function(progress) {
       var p, r, s;
-      if (!this.mesh) {
-        return;
-      }
       this.show();
       if (progress < 0.1 || progress > 0.9) {
         p = progress;

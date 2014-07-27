@@ -4,8 +4,6 @@ class @Count extends Backbone.Model
     @scene = @get('scene')
     @camera = @get('camera')
 
-    @mesh = @_generateMesh()
-
     @sourceRotation = Math.PI*0.5
     @deltaRotation = Math.PI*-0.5
     if Math.random() > 0.5
@@ -14,9 +12,22 @@ class @Count extends Backbone.Model
     @sourceScale = 5
     @deltaScale = -4
 
-    @on 'change:shown', ((model, value, obj)-> model.scene.remove model.mesh if model.mesh && value == false), this
-    @on 'change:shown', ((model, value, obj)-> model.scene.add model.mesh if model.mesh && value == true), this
+    @on 'change:shown', ((model, value, obj)->
+      # when the 'shown' attribute changes to true; initialize a new mesh and add it to the scene
+      if value == true
+        if @mesh
+          clr = @mesh.material.color.getHSL()
+          @mesh.material.color.setHSL Math.random(), clr.s, clr.l
+        else
+          @mesh = @_generateMesh() 
+        @scene.add @mesh
+        return
 
+      # when the 'shown' attribute changes to false; remove the mesh (if one was found) from the scene
+      @scene.remove @mesh if @mesh  # && value == false
+    ), this
+
+    # start with 'shown' set to false by default
     @set(shown: false) if @get('shown') == undefined
 
   destroy: ->
@@ -55,7 +66,6 @@ class @Count extends Backbone.Model
 
   _generateMesh: ->
     mesh = new THREE.Mesh( @geometry || @_generateGeometry(), @material || @_generateMaterial() )
-
     mesh.position.x = 0
     mesh.position.y = 0
     mesh.position.z = @camera.position.z - 120
@@ -63,7 +73,6 @@ class @Count extends Backbone.Model
 
   # progress should be a number between 0.0 and 1.0 (but this is not really necessary)
   update: (progress) ->
-    return if !@mesh
     @show()
 
     if progress < 0.1 || progress > 0.9
