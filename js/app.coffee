@@ -10,7 +10,7 @@ class @App extends Backbone.Model
 
 		@on 'change:paused', ((app, paused, obj) -> @timer.setPaused(paused)), this
 
-		@timer = new Timer(duration: 10000)
+		@timer = new Timer(duration: 20000)
 		@timer.start()
 		@timer.on 'change:progress', ((timer, progress, obj) -> @controls.data.timeline = progress * 100), this
 		@on 'update', @timer.update, @timer
@@ -48,8 +48,10 @@ class @App extends Backbone.Model
 		@camera_operator = new CameraOperator(camera: @camera, scene: @scene, speed: 0, rotation_speed: 0.0)
 		# @on 'update', (-> @camera_operator.update()), this
 
-		# @post_processor = new PostProcessor(renderer: @renderer, camera: @camera, scene: @scene)
+		@post_processor = new PostProcessor(renderer: @renderer, camera: @camera, scene: @scene)
 		# @on 'update', (-> @post_processor.update()), this
+		@timer.on 'change:progress', (model, value, obj) =>
+			@post_processor.update(blindsProgress: value)
 
 		@counts =	_.map _.range(10), (number, idx, list) =>
 			# create count animation

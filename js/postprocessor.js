@@ -18,13 +18,12 @@
       this.camera = this.options.camera;
       this.composer = new THREE.EffectComposer(this.renderer);
       this.composer.addPass(new THREE.RenderPass(this.scene, this.camera));
-      this.effect1 = new THREE.ShaderPass(THREE.DotScreenShader);
-      this.effect1.uniforms['scale'].value = 4;
-      this.composer.addPass(this.effect1);
-      this.effect2 = new THREE.ShaderPass(THREE.RGBShiftShader);
-      this.effect2.uniforms['amount'].value = 0.0015;
-      this.effect2.renderToScreen = true;
-      return this.composer.addPass(this.effect2);
+      this.blindsEffect = new THREE.ShaderPass(THREE.BlindsShader);
+      this.blindsEffect.renderToScreen = true;
+      this.composer.addPass(this.blindsEffect);
+      return this.on('update', function(model, opts) {
+        return model.blindsEffect.uniforms.progress.value = (opts || {}).blindsProgress || 0.0;
+      });
     };
 
     PostProcessor.prototype.destroy = function() {
@@ -32,15 +31,12 @@
       if (this.composer) {
         this.composer = void 0;
       }
-      return this.scene = this.camera = void 0;
+      return this.dotScreenEffect = this.rgbShiftEffect = this.scene = this.camera = void 0;
     };
 
-    PostProcessor.prototype.update = function() {
-      var tmp;
+    PostProcessor.prototype.update = function(opts) {
       this.frame || (this.frame = 0);
-      this.effect2.uniforms.amplitude.value = Math.sin(this.frame) * 0.03;
-      tmp = 150 + Math.sin(this.frame * 0.1) * 106;
-      this.effect1.uniforms.tSize.value = new THREE.Vector2(tmp, tmp);
+      this.trigger('update', this, opts);
       return this.frame += 0.05;
     };
 

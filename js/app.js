@@ -35,7 +35,7 @@
         return this.timer.setPaused(paused);
       }), this);
       this.timer = new Timer({
-        duration: 10000
+        duration: 20000
       });
       this.timer.start();
       this.timer.on('change:progress', (function(timer, progress, obj) {
@@ -73,6 +73,16 @@
         scene: this.scene,
         speed: 0,
         rotation_speed: 0.0
+      });
+      this.post_processor = new PostProcessor({
+        renderer: this.renderer,
+        camera: this.camera,
+        scene: this.scene
+      });
+      this.timer.on('change:progress', function(model, value, obj) {
+        return _this.post_processor.update({
+          blindsProgress: value
+        });
       });
       this.counts = _.map(_.range(10), function(number, idx, list) {
         return new Count({

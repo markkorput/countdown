@@ -94,4 +94,33 @@
     fragmentShader: "uniform sampler2D tDiffuse;\nuniform float amount;\nuniform float angle;\n\nvarying vec2 vUv;\n\nvoid main() {\n  vec2 offset = amount * vec2( cos(angle), sin(angle));\n  vec4 cr = texture2D(tDiffuse, vUv + offset);\n  vec4 cga = texture2D(tDiffuse, vUv);\n  vec4 cb = texture2D(tDiffuse, vUv - offset);\n  gl_FragColor = vec4(cr.r, cga.g, cb.b, cga.a);\n}"
   };
 
+  /*
+    @author markkorput / http://markkorput.github.com/
+  
+    A blinds effect  
+  
+    progress: float value between 0.0 and 1.0, 0.0 meaning no blinds, 1.0 meaning blinds all shut
+    color: blinds color
+  */
+
+
+  THREE.BlindsShader = {
+    uniforms: {
+      'tDiffuse': {
+        type: "t",
+        value: null
+      },
+      "color": {
+        type: "c",
+        value: new THREE.Color(0xFF0000)
+      },
+      "progress": {
+        type: 'f',
+        value: 0.0
+      }
+    },
+    vertexShader: "varying vec2 vUv;\n\nvoid main() {\n  vUv = uv;\n  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}",
+    fragmentShader: "uniform sampler2D tDiffuse;\nuniform vec3 color;\nuniform float progress;\n\nvarying vec2 vUv;\n\nvoid main() {\n  vec4 cga = texture2D(tDiffuse, vUv);\n  if(vUv.y < progress) cga = vec4( color, 1.0 );\n  gl_FragColor = cga;\n}"
+  };
+
 }).call(this);
