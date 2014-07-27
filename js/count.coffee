@@ -4,22 +4,6 @@ class @Count extends Backbone.Model
     @scene = @get('scene')
     @camera = @get('camera')
 
-    # @geometry = new THREE.CubeGeometry 50, 50, 50
-    @geometry = new THREE.TextGeometry(''+(@get('text') || 0), {
-      size: 40,
-      height: 5,
-      curveSegments: 30,
-      font: "helvetiker",
-      weight: "bold",
-      style: "normal",
-      # bevelThickness: 2,
-      bevelSize: 1,
-      bevelEnabled: true
-    })
-    THREE.GeometryUtils.center( @geometry )
-
-    # @material = new THREE.MeshLambertMaterial({color: 0xFF0000 })
-    @material = new THREE.MeshBasicMaterial({color: 0xFF0000 })
     @mesh = @_generateMesh()
 
     @sourceRotation = Math.PI*0.5
@@ -30,6 +14,11 @@ class @Count extends Backbone.Model
     @sourceScale = 5
     @deltaScale = -4
 
+    @on 'change:shown', ((model, value, obj)-> model.scene.remove model.mesh if model.mesh && value == false), this
+    @on 'change:shown', ((model, value, obj)-> model.scene.add model.mesh if model.mesh && value == true), this
+
+    @set(shown: false) if @get('shown') == undefined
+
   destroy: ->
     @trigger 'destroy'
 
@@ -37,19 +26,40 @@ class @Count extends Backbone.Model
       @scene.remove @mesh
       @mesh = undefined
 
-    @scene = @camera = @geometry = @material = undefined
+    @scene = @camera = undefined
     super()
 
+  hide: -> @set(shown: false) 
+  show: -> @set(shown: true)
+
+  _generateGeometry: ->
+    # geometry = new THREE.CubeGeometry 50, 50, 50
+    geometry = new THREE.TextGeometry(''+(@get('text') || 0), {
+      size: 40,
+      height: 5,
+      curveSegments: 30,
+      font: "helvetiker",
+      weight: "bold",
+      style: "normal",
+      # bevelThickness: 2,
+      bevelSize: 1,
+      bevelEnabled: true
+    })
+
+    THREE.GeometryUtils.center( geometry )
+    return geometry
+
+  _generateMaterial: ->
+    # @material = new THREE.MeshLambertMaterial({color: 0xFF0000 })
+    new THREE.MeshBasicMaterial({color: 0xFF0000 })
+
   _generateMesh: ->
-    mesh = new THREE.Mesh( @geometry, @material )
+    mesh = new THREE.Mesh( @geometry || @_generateGeometry(), @material || @_generateMaterial() )
 
     mesh.position.x = 0
     mesh.position.y = 0
     mesh.position.z = @camera.position.z - 120
     mesh
-
-  hide: -> @scene.remove @mesh if @mesh
-  show: -> @scene.add @mesh if @mesh
 
   # progress should be a number between 0.0 and 1.0 (but this is not really necessary)
   update: (progress) ->

@@ -16,7 +16,57 @@
       this.destroy();
       this.scene = this.get('scene');
       this.camera = this.get('camera');
-      this.geometry = new THREE.TextGeometry('' + (this.get('text') || 0), {
+      this.mesh = this._generateMesh();
+      this.sourceRotation = Math.PI * 0.5;
+      this.deltaRotation = Math.PI * -0.5;
+      if (Math.random() > 0.5) {
+        this.sourceRotation = this.sourceRotation * -1;
+        this.deltaRotation = this.deltaRotation * -1;
+      }
+      this.sourceScale = 5;
+      this.deltaScale = -4;
+      this.on('change:shown', (function(model, value, obj) {
+        if (model.mesh && value === false) {
+          return model.scene.remove(model.mesh);
+        }
+      }), this);
+      this.on('change:shown', (function(model, value, obj) {
+        if (model.mesh && value === true) {
+          return model.scene.add(model.mesh);
+        }
+      }), this);
+      if (this.get('shown') === void 0) {
+        return this.set({
+          shown: false
+        });
+      }
+    };
+
+    Count.prototype.destroy = function() {
+      this.trigger('destroy');
+      if (this.mesh) {
+        this.scene.remove(this.mesh);
+        this.mesh = void 0;
+      }
+      this.scene = this.camera = void 0;
+      return Count.__super__.destroy.call(this);
+    };
+
+    Count.prototype.hide = function() {
+      return this.set({
+        shown: false
+      });
+    };
+
+    Count.prototype.show = function() {
+      return this.set({
+        shown: true
+      });
+    };
+
+    Count.prototype._generateGeometry = function() {
+      var geometry;
+      geometry = new THREE.TextGeometry('' + (this.get('text') || 0), {
         size: 40,
         height: 5,
         curveSegments: 30,
@@ -26,50 +76,23 @@
         bevelSize: 1,
         bevelEnabled: true
       });
-      THREE.GeometryUtils.center(this.geometry);
-      this.material = new THREE.MeshBasicMaterial({
-        color: 0xFF0000
-      });
-      this.mesh = this._generateMesh();
-      this.sourceRotation = Math.PI * 0.5;
-      this.deltaRotation = Math.PI * -0.5;
-      if (Math.random() > 0.5) {
-        this.sourceRotation = this.sourceRotation * -1;
-        this.deltaRotation = this.deltaRotation * -1;
-      }
-      this.sourceScale = 5;
-      return this.deltaScale = -4;
+      THREE.GeometryUtils.center(geometry);
+      return geometry;
     };
 
-    Count.prototype.destroy = function() {
-      this.trigger('destroy');
-      if (this.mesh) {
-        this.scene.remove(this.mesh);
-        this.mesh = void 0;
-      }
-      this.scene = this.camera = this.geometry = this.material = void 0;
-      return Count.__super__.destroy.call(this);
+    Count.prototype._generateMaterial = function() {
+      return new THREE.MeshBasicMaterial({
+        color: 0xFF0000
+      });
     };
 
     Count.prototype._generateMesh = function() {
       var mesh;
-      mesh = new THREE.Mesh(this.geometry, this.material);
+      mesh = new THREE.Mesh(this.geometry || this._generateGeometry(), this.material || this._generateMaterial());
       mesh.position.x = 0;
       mesh.position.y = 0;
       mesh.position.z = this.camera.position.z - 120;
       return mesh;
-    };
-
-    Count.prototype.hide = function() {
-      if (this.mesh) {
-        return this.scene.remove(this.mesh);
-      }
-    };
-
-    Count.prototype.show = function() {
-      if (this.mesh) {
-        return this.scene.add(this.mesh);
-      }
     };
 
     Count.prototype.update = function(progress) {
