@@ -24,12 +24,11 @@ class @Count extends Backbone.Model
       if Math.random() > 0.5
         model.sourceRotationY = model.sourceRotationY * -1
         model.deltaRotationY = model.deltaRotationY * -1
-      if Math.random() > 0.5
+      if Math.random() > 0.5 && (model.get('text') + '') != '1'
         model.sourceRotationZ = model.sourceRotationZ * -1
         model.deltaRotationZ = model.deltaRotationZ * -1
 
       model.sourceScale = 5
-      model.sourceScale *= -1 if model.sourceRotationZ < 0
       model.deltaScale = 1 - model.sourceScale
 
     # when we get a new mesh; add it to the scene

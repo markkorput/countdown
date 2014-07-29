@@ -34,14 +34,11 @@
           model.sourceRotationY = model.sourceRotationY * -1;
           model.deltaRotationY = model.deltaRotationY * -1;
         }
-        if (Math.random() > 0.5) {
+        if (Math.random() > 0.5 && (model.get('text') + '') !== '1') {
           model.sourceRotationZ = model.sourceRotationZ * -1;
           model.deltaRotationZ = model.deltaRotationZ * -1;
         }
         model.sourceScale = 5;
-        if (model.sourceRotationZ < 0) {
-          model.sourceScale *= -1;
-        }
         return model.deltaScale = 1 - model.sourceScale;
       });
       this.on('change:mesh', function(model, value, obj) {
