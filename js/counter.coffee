@@ -7,6 +7,9 @@ class @Counter extends Backbone.Model
       count = new Count(scene: @get('scene'), camera: @get('camera'), text: number)
       count_op = new CountOps(target: count)
 
+    @grids = _.map @count_ops, (op, idx, list) =>
+      grid = new CountGrid(scene: @get('scene'), camera: @get('camera'), count: op.target)
+
   update: (progress) ->
     @set(progress: progress)
 

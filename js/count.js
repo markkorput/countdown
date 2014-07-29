@@ -61,7 +61,7 @@
 
     Count.prototype.destroy = function() {
       this.trigger('destroy');
-      this.hide;
+      this.hide();
       this.scene = this.camera = void 0;
       return Count.__super__.destroy.call(this);
     };

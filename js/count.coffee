@@ -45,7 +45,7 @@ class @Count extends Backbone.Model
 
   destroy: ->
     @trigger 'destroy'
-    @hide
+    @hide()
     @scene = @camera = undefined
     super()
 

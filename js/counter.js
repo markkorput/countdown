@@ -15,7 +15,7 @@
     Counter.prototype.initialize = function() {
       var _this = this;
       this.amount = 10;
-      return this.count_ops = _.map(_.range(this.amount), function(number, idx, list) {
+      this.count_ops = _.map(_.range(this.amount), function(number, idx, list) {
         var count, count_op;
         count = new Count({
           scene: _this.get('scene'),
@@ -24,6 +24,14 @@
         });
         return count_op = new CountOps({
           target: count
+        });
+      });
+      return this.grids = _.map(this.count_ops, function(op, idx, list) {
+        var grid;
+        return grid = new CountGrid({
+          scene: _this.get('scene'),
+          camera: _this.get('camera'),
+          count: op.target
         });
       });
     };
