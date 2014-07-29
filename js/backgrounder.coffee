@@ -48,7 +48,12 @@ class @Backgrounder extends Backbone.Model
     return geometry
 
   _generateMaterials: ->
-    materials = _.map @get('shaders') || [THREE.BgPendingChaosShader], (shader) ->
+    # materials = _.map @get('shaders') || [THREE.BgPendingChaosShader], (shader) ->
+    #   new THREE.ShaderMaterial( shader )
+
+    obj = new BackgroundShaders()
+    _.map obj.fragmentShaders, (fragmentShader) ->
+      shader = {uniforms: obj.uniforms, vertexShader: obj.vertexShader, fragmentShader: fragmentShader}
       new THREE.ShaderMaterial( shader )
 
   _generateMeshes: ->
@@ -73,3 +78,61 @@ class @Backgrounder extends Backbone.Model
 
     if opts.time && mesh = @get('mesh')
       mesh.material.uniforms.time.value = opts.time * 100
+
+
+BackgroundShaders = ->
+  @uniforms = {
+    'time': {type: 'f', value: 0.0}
+  }
+
+  @vertexShader =  THREE.DefaultVertexShader
+
+  @fragmentShaders = []
+
+  @fragmentShaders.push """
+    #ifdef GL_ES
+    precision mediump float;
+    #endif
+
+    uniform float time;
+
+    void main( void ) {
+      gl_FragColor = vec4(sin(gl_FragCoord.x/2.0+(time*10.0)));
+    }
+  """
+
+  @fragmentShaders.push """
+    #ifdef GL_ES
+    precision mediump float;
+    #endif
+
+    uniform float time;
+
+    void main( void ) {
+      gl_FragColor = vec4(sin(gl_FragCoord.y/2.0+(time*10.0)));
+    }
+  """
+
+  @fragmentShaders.push """
+    #ifdef GL_ES
+    precision mediump float;
+    #endif
+
+    uniform float time;
+
+    void main( void ) {
+      gl_FragColor = vec4(sin((gl_FragCoord.y + gl_FragCoord.x)/2.0+(time*10.0)));
+    }
+  """
+
+  @fragmentShaders.push """
+    #ifdef GL_ES
+    precision mediump float;
+    #endif
+
+    uniform float time;
+
+    void main( void ) {
+      gl_FragColor = vec4(sin((gl_FragCoord.y + gl_FragCoord.x)/2.0+(time*10.0)));
+    }
+  """

@@ -109,8 +109,7 @@
       });
       this.backgrounder = new Backgrounder({
         scene: this.scene,
-        camera: this.camera,
-        shaders: [THREE.BgPendingChaosShader, THREE.BgPendingChaosShader2]
+        camera: this.camera
       });
       this.timer.on('change:progress', (function(model, value, obj) {
         return this.backgrounder.update({
