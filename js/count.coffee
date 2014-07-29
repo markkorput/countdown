@@ -18,13 +18,19 @@ class @Count extends Backbone.Model
 
     # (re-)initialize the transformation params everytime when being shown
     @on 'show', (model) ->
-      model.sourceRotation = Math.PI*0.5
-      model.deltaRotation = Math.PI*-0.5
+      model.sourceRotationY = model.sourceRotationZ = Math.PI*0.5
+      model.deltaRotationY = model.deltaRotationZ = Math.PI*-0.5
+
       if Math.random() > 0.5
-        model.sourceRotation = model.sourceRotation * -1
-        model.deltaRotation = model.deltaRotation * -1
+        model.sourceRotationY = model.sourceRotationY * -1
+        model.deltaRotationY = model.deltaRotationY * -1
+      if Math.random() > 0.5
+        model.sourceRotationZ = model.sourceRotationZ * -1
+        model.deltaRotationZ = model.deltaRotationZ * -1
+
       model.sourceScale = 5
-      model.deltaScale = -4
+      model.sourceScale *= -1 if model.sourceRotationZ < 0
+      model.deltaScale = 1 - model.sourceScale
 
     # when we get a new mesh; add it to the scene
     @on 'change:mesh', (model, value, obj) ->
@@ -102,17 +108,19 @@ class @Count extends Backbone.Model
     return if !(mesh = @get('mesh'))
     if progress < 0.1 || progress > 0.9
       p = progress
-      r = @sourceRotation
+      ry = @sourceRotationY
+      rz = @sourceRotationZ
       s = @sourceScale
     else
       # p = Math.sin(progress * Math.PI/2)
       p = (progress - 0.1) / 0.8
-      r = @sourceRotation + Math.sin(p * Math.PI) * @deltaRotation
+      ry = @sourceRotationY + Math.sin(p * Math.PI) * @deltaRotationY
+      rz = @sourceRotationZ + Math.sin(p * Math.PI) * @deltaRotationZ
       s = @sourceScale + Math.sin(p * Math.PI) * @deltaScale
       # s = 2.5 + Math.abs((p - 0.5)) * 2.5
 
-    mesh.rotation.y = r
-    mesh.rotation.z = r
+    mesh.rotation.y = ry
+    mesh.rotation.z = rz
     mesh.scale = new THREE.Vector3(s,s,s)
 
 

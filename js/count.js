@@ -28,14 +28,21 @@
         });
       });
       this.on('show', function(model) {
-        model.sourceRotation = Math.PI * 0.5;
-        model.deltaRotation = Math.PI * -0.5;
+        model.sourceRotationY = model.sourceRotationZ = Math.PI * 0.5;
+        model.deltaRotationY = model.deltaRotationZ = Math.PI * -0.5;
         if (Math.random() > 0.5) {
-          model.sourceRotation = model.sourceRotation * -1;
-          model.deltaRotation = model.deltaRotation * -1;
+          model.sourceRotationY = model.sourceRotationY * -1;
+          model.deltaRotationY = model.deltaRotationY * -1;
+        }
+        if (Math.random() > 0.5) {
+          model.sourceRotationZ = model.sourceRotationZ * -1;
+          model.deltaRotationZ = model.deltaRotationZ * -1;
         }
         model.sourceScale = 5;
-        return model.deltaScale = -4;
+        if (model.sourceRotationZ < 0) {
+          model.sourceScale *= -1;
+        }
+        return model.deltaScale = 1 - model.sourceScale;
       });
       this.on('change:mesh', function(model, value, obj) {
         if (model.scene) {
@@ -131,7 +138,7 @@
     };
 
     Count.prototype.show = function(progress) {
-      var mesh, p, r, s;
+      var mesh, p, ry, rz, s;
       this.set({
         shown: true
       });
@@ -140,15 +147,17 @@
       }
       if (progress < 0.1 || progress > 0.9) {
         p = progress;
-        r = this.sourceRotation;
+        ry = this.sourceRotationY;
+        rz = this.sourceRotationZ;
         s = this.sourceScale;
       } else {
         p = (progress - 0.1) / 0.8;
-        r = this.sourceRotation + Math.sin(p * Math.PI) * this.deltaRotation;
+        ry = this.sourceRotationY + Math.sin(p * Math.PI) * this.deltaRotationY;
+        rz = this.sourceRotationZ + Math.sin(p * Math.PI) * this.deltaRotationZ;
         s = this.sourceScale + Math.sin(p * Math.PI) * this.deltaScale;
       }
-      mesh.rotation.y = r;
-      mesh.rotation.z = r;
+      mesh.rotation.y = ry;
+      mesh.rotation.z = rz;
       return mesh.scale = new THREE.Vector3(s, s, s);
     };
 
