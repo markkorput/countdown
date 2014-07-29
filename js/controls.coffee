@@ -16,6 +16,7 @@ class @Controls extends Backbone.Model
 			@timeline = 0
 			@loop = true
 			@playing = true
+			@duration = 10000
 
 		folder = @gui.addFolder 'Animation'
 		folder.open()
@@ -31,6 +32,10 @@ class @Controls extends Backbone.Model
 		item = folder.add(@data, 'loop')
 		item.listen()
 		item.onChange (val) => @trigger('toggle-loop', val)
+
+		item = folder.add(@data, 'duration', 0, 50000)
+		item.listen()
+		item.onChange (val) => @trigger('duration', val) # communicate in 0.0 - 1.0 ranges with outside
 
 	destroy: ->
 		@trigger 'destroy'

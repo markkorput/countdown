@@ -31,6 +31,11 @@
           paused: !playing
         });
       }), this);
+      this.controls.on('duration', (function(value) {
+        return this.timer.set({
+          duration: parseInt(value)
+        });
+      }), this);
       this.on('change:paused', (function(app, paused, obj) {
         return this.timer.setPaused(paused);
       }), this);
@@ -51,7 +56,7 @@
       this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
       this.renderer = new THREE.WebGLRenderer();
       this._resize();
-      $(window).resize(this._resize);
+      window.addEventListener('resize', this._resize, false);
       return document.body.appendChild(this.renderer.domElement);
     };
 

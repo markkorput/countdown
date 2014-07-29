@@ -7,6 +7,7 @@ class @App extends Backbone.Model
 		@controls.on 'toggle-loop', ((value) -> @timer.set(loop: value).start()), this
 		@controls.on 'timeline', ((value) -> @timer.setProgress(value)), this
 		@controls.on 'toggle-playing', ((playing)-> @set(paused: !playing)), this
+		@controls.on 'duration', ((value) -> @timer.set(duration: parseInt(value))), this
 
 		@on 'change:paused', ((app, paused, obj) -> @timer.setPaused(paused)), this
 
@@ -20,7 +21,6 @@ class @App extends Backbone.Model
 		@update()
 
 	_initVfx: ->
-		# @camera = new THREE.OrthographicCamera(-1200, 1000, -1100, 1200, 10, 10000)
 		@camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000)
 
 		# @renderer = new THREE.CanvasRenderer()
@@ -29,7 +29,9 @@ class @App extends Backbone.Model
 		# perform window-size based configuration
 		@_resize()
 		# add event hook, to perform re-configuration when the window resizes
-		$(window).resize @_resize
+		# $(window).resize @_resize
+
+		window.addEventListener( 'resize', @_resize, false );
 
 		# add our canvas element to the page
 		document.body.appendChild(this.renderer.domElement)

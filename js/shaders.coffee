@@ -175,9 +175,10 @@ THREE.RGBShiftShader = {
 THREE.BlindsShader =
   uniforms:
     # type 'texture' uniform, passed by Three.js; contains the bitmap of previous shader
-    'tDiffuse': { type: "t", value: null },
+    "tDiffuse": { type: "t", value: null },
     "color": {type: "c", value: new THREE.Color( 0xFF0000 ) }
     "progress": {type: 'f', value: 0.0}
+    "amount": {type: 'i', value: 10}
 
   vertexShader: """
     varying vec2 vUv;

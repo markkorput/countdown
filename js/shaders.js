@@ -106,7 +106,7 @@
 
   THREE.BlindsShader = {
     uniforms: {
-      'tDiffuse': {
+      "tDiffuse": {
         type: "t",
         value: null
       },
@@ -117,6 +117,10 @@
       "progress": {
         type: 'f',
         value: 0.0
+      },
+      "amount": {
+        type: 'i',
+        value: 10
       }
     },
     vertexShader: "varying vec2 vUv;\n\nvoid main() {\n  vUv = uv;\n  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}",

@@ -4,14 +4,6 @@ class @Count extends Backbone.Model
     @scene = @get('scene')
     @camera = @get('camera')
 
-    @sourceRotation = Math.PI*0.5
-    @deltaRotation = Math.PI*-0.5
-    if Math.random() > 0.5
-      @sourceRotation = @sourceRotation * -1
-      @deltaRotation = @deltaRotation * -1
-    @sourceScale = 5
-    @deltaScale = -4
-
     #
     # create event hooks
     #
@@ -23,6 +15,16 @@ class @Count extends Backbone.Model
     # make sure we have a mesh when being shown
     @on 'show', (model) ->
       model.set(mesh: @_generateMesh()) 
+
+    # (re-)initialize the transformation params everytime when being shown
+    @on 'show', (model) ->
+      model.sourceRotation = Math.PI*0.5
+      model.deltaRotation = Math.PI*-0.5
+      if Math.random() > 0.5
+        model.sourceRotation = model.sourceRotation * -1
+        model.deltaRotation = model.deltaRotation * -1
+      model.sourceScale = 5
+      model.deltaScale = -4
 
     # when we get a new mesh; add it to the scene
     @on 'change:mesh', (model, value, obj) ->

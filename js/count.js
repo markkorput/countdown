@@ -16,14 +16,6 @@
       this.destroy();
       this.scene = this.get('scene');
       this.camera = this.get('camera');
-      this.sourceRotation = Math.PI * 0.5;
-      this.deltaRotation = Math.PI * -0.5;
-      if (Math.random() > 0.5) {
-        this.sourceRotation = this.sourceRotation * -1;
-        this.deltaRotation = this.deltaRotation * -1;
-      }
-      this.sourceScale = 5;
-      this.deltaScale = -4;
       this.on('change:shown', function(model, value, obj) {
         return model.trigger({
           "true": 'show',
@@ -34,6 +26,16 @@
         return model.set({
           mesh: this._generateMesh()
         });
+      });
+      this.on('show', function(model) {
+        model.sourceRotation = Math.PI * 0.5;
+        model.deltaRotation = Math.PI * -0.5;
+        if (Math.random() > 0.5) {
+          model.sourceRotation = model.sourceRotation * -1;
+          model.deltaRotation = model.deltaRotation * -1;
+        }
+        model.sourceScale = 5;
+        return model.deltaScale = -4;
       });
       this.on('change:mesh', function(model, value, obj) {
         if (model.scene) {
