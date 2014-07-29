@@ -18,13 +18,13 @@
       this.camera = this.options.camera;
       this.composer = new THREE.EffectComposer(this.renderer);
       this.composer.addPass(new THREE.RenderPass(this.scene, this.camera));
-      this.blindsEffect = new THREE.ShaderPass(THREE.BlindsShader);
-      this.blindsEffect.renderToScreen = true;
-      this.composer.addPass(this.blindsEffect);
+      this.fadeEffect = new THREE.ShaderPass(THREE.FadeShader);
+      this.fadeEffect.renderToScreen = true;
+      this.composer.addPass(this.fadeEffect);
       return this.on('update', function(model, opts) {
-        opts = opts.blinds || {};
-        model.blindsEffect.uniforms.progress.value = opts.progress || 0.0;
-        return model.blindsEffect.uniforms.color.value = opts.color || new THREE.Color(1.0, 0.0, 0.0);
+        opts = opts.fade || {};
+        model.fadeEffect.uniforms.progress.value = opts.progress || 0.0;
+        return model.fadeEffect.uniforms.color.value = opts.color || new THREE.Color(1.0, 0.0, 0.0);
       });
     };
 
@@ -37,9 +37,7 @@
     };
 
     PostProcessor.prototype.update = function(opts) {
-      this.frame || (this.frame = 0);
-      this.trigger('update', this, opts);
-      return this.frame += 0.05;
+      return this.trigger('update', this, opts);
     };
 
     return PostProcessor;

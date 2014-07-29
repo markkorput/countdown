@@ -66,7 +66,7 @@ class @App extends Backbone.Model
 			else
 				t = 0.0
 
-			@post_processor.update(blinds: {progress: t, color: @counter.nextColor()})
+			@post_processor.update(fade: {progress: t, color: @counter.nextColor()})
 
 
 		return @scene

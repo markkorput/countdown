@@ -21,18 +21,26 @@ class @PostProcessor extends Backbone.Model
 
     # @rgbShiftEffect = new THREE.ShaderPass( THREE.RGBShiftShader )
     # @rgbShiftEffect.uniforms[ 'amount' ].value = 0.0015;
-    # @rgbShiftEffect.renderToScreen = true
+    # # @rgbShiftEffect.renderToScreen = true
     # @composer.addPass @rgbShiftEffect
     # @on 'update', (model) ->
     #     model.rgbShiftEffect.uniforms.amplitude.value = Math.sin(model.frame || 0.0) * 0.03
 
-    @blindsEffect = new THREE.ShaderPass( THREE.BlindsShader )
-    @blindsEffect.renderToScreen = true
-    @composer.addPass @blindsEffect
+    # @blindsEffect = new THREE.ShaderPass( THREE.BlindsShader )
+    # # @blindsEffect.renderToScreen = true
+    # @composer.addPass @blindsEffect
+    # @on 'update', (model, opts) ->
+    #     opts = opts.blinds || {}
+    #     model.blindsEffect.uniforms.progress.value = opts.progress || 0.0
+    #     model.blindsEffect.uniforms.color.value = opts.color || new THREE.Color(1.0, 0.0, 0.0)
+
+    @fadeEffect = new THREE.ShaderPass( THREE.FadeShader )
+    @fadeEffect.renderToScreen = true
+    @composer.addPass @fadeEffect
     @on 'update', (model, opts) ->
-        opts = opts.blinds || {}
-        model.blindsEffect.uniforms.progress.value = opts.progress || 0.0
-        model.blindsEffect.uniforms.color.value = opts.color || new THREE.Color(1.0, 0.0, 0.0)
+        opts = opts.fade || {}
+        model.fadeEffect.uniforms.progress.value = opts.progress || 0.0
+        model.fadeEffect.uniforms.color.value = opts.color || new THREE.Color(1.0, 0.0, 0.0)
 
   destroy: ->
     @trigger 'destroy'
@@ -43,6 +51,5 @@ class @PostProcessor extends Backbone.Model
     @dotScreenEffect = @rgbShiftEffect = @scene = @camera = undefined
 
   update: (opts) ->
-    @frame ||= 0
     @trigger 'update', this, opts
-    @frame += 0.05
+

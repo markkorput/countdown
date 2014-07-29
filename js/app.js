@@ -101,7 +101,7 @@
           t = 0.0;
         }
         return _this.post_processor.update({
-          blinds: {
+          fade: {
             progress: t,
             color: _this.counter.nextColor()
           }
