@@ -24,6 +24,7 @@
       });
       this.on('show', function(model) {
         var mesh;
+        model.randomizeColor();
         if (!(mesh = model.get('mesh'))) {
           mesh = model._generateMesh();
           model.set({
@@ -44,9 +45,8 @@
       this.on('hide', function(model) {
         var m;
         if (model.scene && (m = model.get('mesh'))) {
-          model.scene.remove(m);
+          return model.scene.remove(m);
         }
-        return model.randomizeColor();
       });
       this.on('change:color', function(model, value, obj) {
         var m;
@@ -98,7 +98,7 @@
     };
 
     Count.prototype._defaultColor = function() {
-      return new THREE.Color(255, 0, 0);
+      return new THREE.Color(255, 255, 255);
     };
 
     Count.prototype.randomizeColor = function() {

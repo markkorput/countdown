@@ -14,6 +14,9 @@ class @Count extends Backbone.Model
 
     # make sure we have a mesh when being shown
     @on 'show', (model) ->
+      # extra; randomize color when hiding, so next time it's shown, it has a different color
+      model.randomizeColor()
+
       # if mesh DOESN'T already exist; generate mesh first
       if !(mesh = model.get('mesh')) 
         mesh = model._generateMesh()
@@ -31,9 +34,6 @@ class @Count extends Backbone.Model
     @on 'hide', (model) ->
       if model.scene && m = model.get('mesh')
         model.scene.remove m
-
-      # extra; andomize color when hiding, so next time it's shown, it has a different color
-      model.randomizeColor()
 
     @on 'change:color', (model, value, obj) ->
       # when the color attribute changes, see if we have a mesh loaded, if so, change it's material's color directly
@@ -78,7 +78,7 @@ class @Count extends Backbone.Model
     mesh.position.z = @camera.position.z - 120
     mesh
 
-  _defaultColor: -> new THREE.Color(255, 0, 0)
+  _defaultColor: -> new THREE.Color(255, 255, 255)
 
   randomizeColor: ->
     clr = @get('color').clone() if @get('color')
