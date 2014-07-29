@@ -14,7 +14,13 @@ class @Count extends Backbone.Model
 
     # make sure we have a mesh when being shown
     @on 'show', (model) ->
-      model.set(mesh: @_generateMesh()) 
+      # if mesh DOESN'T already exist; generate mesh first
+      if !(mesh = model.get('mesh')) 
+        mesh = model._generateMesh()
+        model.set(mesh: mesh)
+
+      # add existing or newly created mesh to the scene
+      model.scene.add mesh if model.scene && mesh
 
     # (re-)initialize the transformation params everytime when being shown
     @on 'show', (model) ->
@@ -38,21 +44,23 @@ class @Count extends Backbone.Model
       model.sourceScale = 5
       model.deltaScale = 1 - model.sourceScale
 
-    # when we get a new mesh; add it to the scene
+    # when we get a new mesh; make sure the any previous mesh gets removed from the scene
     @on 'change:mesh', (model, value, obj) ->
       if model.scene
         model.scene.remove model.previous('mesh') if model.previous('mesh')
-        model.scene.add value 
 
     # remove mesh from scene when hiding
     @on 'hide', (model) ->
-      model.randomizeColor()
-
       if model.scene && m = model.get('mesh')
         model.scene.remove m
 
+      # extra; andomize color when hiding, so next time it's shown, it has a different color
+      model.randomizeColor()
+
     @on 'change:color', (model, value, obj) ->
-      model.set(mesh: @_generateMesh())
+      # when the color attribute changes, see if we have a mesh loaded, if so, change it's material's color directly
+      if m = model.get('mesh') && model.get('mesh').material
+        model.get('mesh').material.color = value
 
     # start hidden by default
     @hide() if @get('shown') == undefined
@@ -96,7 +104,7 @@ class @Count extends Backbone.Model
 
   randomizeColor: ->
     clr = @get('color').clone() if @get('color')
-    clr ||= mesh.material.color.getHSL() if mesh = @get('mesh')
+    clr ||= mesh.material.color if mesh = @get('mesh')
     clr ||= @_defaultColor()
     hsl = clr.getHSL()
     clr.setHSL Math.random(), hsl.s, hsl.l

@@ -23,9 +23,16 @@
         }[value], model);
       });
       this.on('show', function(model) {
-        return model.set({
-          mesh: this._generateMesh()
-        });
+        var mesh;
+        if (!(mesh = model.get('mesh'))) {
+          mesh = model._generateMesh();
+          model.set({
+            mesh: mesh
+          });
+        }
+        if (model.scene && mesh) {
+          return model.scene.add(mesh);
+        }
       });
       this.on('show', function(model) {
         var randY, randZ;
@@ -51,22 +58,22 @@
       this.on('change:mesh', function(model, value, obj) {
         if (model.scene) {
           if (model.previous('mesh')) {
-            model.scene.remove(model.previous('mesh'));
+            return model.scene.remove(model.previous('mesh'));
           }
-          return model.scene.add(value);
         }
       });
       this.on('hide', function(model) {
         var m;
-        model.randomizeColor();
         if (model.scene && (m = model.get('mesh'))) {
-          return model.scene.remove(m);
+          model.scene.remove(m);
         }
+        return model.randomizeColor();
       });
       this.on('change:color', function(model, value, obj) {
-        return model.set({
-          mesh: this._generateMesh()
-        });
+        var m;
+        if (m = model.get('mesh') && model.get('mesh').material) {
+          return model.get('mesh').material.color = value;
+        }
       });
       if (this.get('shown') === void 0) {
         return this.hide();
@@ -121,7 +128,7 @@
         clr = this.get('color').clone();
       }
       if (mesh = this.get('mesh')) {
-        clr || (clr = mesh.material.color.getHSL());
+        clr || (clr = mesh.material.color);
       }
       clr || (clr = this._defaultColor());
       hsl = clr.getHSL();
