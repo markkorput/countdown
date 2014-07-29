@@ -28,13 +28,20 @@
         });
       });
       this.on('show', function(model) {
+        var randY, randZ;
         model.sourceRotationY = model.sourceRotationZ = Math.PI * 0.5;
         model.deltaRotationY = model.deltaRotationZ = Math.PI * -0.5;
-        if (Math.random() > 0.5) {
+        randY = Math.random() > 0.5;
+        if ((model.get('text') + '') === '1' || (model.get('text') + '') === '7') {
+          randZ = randY;
+        } else {
+          randZ = Math.random() > 0.5;
+        }
+        if (randY > 0.5) {
           model.sourceRotationY = model.sourceRotationY * -1;
           model.deltaRotationY = model.deltaRotationY * -1;
         }
-        if (Math.random() > 0.5 && (model.get('text') + '') !== '1') {
+        if (randZ > 0.5) {
           model.sourceRotationZ = model.sourceRotationZ * -1;
           model.deltaRotationZ = model.deltaRotationZ * -1;
         }
