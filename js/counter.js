@@ -68,7 +68,7 @@
     };
 
     Counter.prototype.currentOp = function() {
-      return this.count_ops.at(this.get('idx'));
+      return this.count_ops.at(this.get('idx')) || this.count_ops.at(this.get('idx') - 1);
     };
 
     Counter.prototype.calcIndex = function() {

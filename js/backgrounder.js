@@ -25,32 +25,24 @@
       this.on('show', function(model) {
         var mesh;
         if (!(mesh = model.get('mesh'))) {
-          mesh = model._generateMesh();
-          model.set({
+          mesh = model.allMeshes()[0];
+          return model.set({
             mesh: mesh
           });
-        }
-        if (model.scene && mesh) {
-          return model.scene.add(mesh);
         }
       });
       this.on('change:mesh', function(model, value, obj) {
         if (model.scene) {
           if (model.previous('mesh')) {
-            return model.scene.remove(model.previous('mesh'));
+            model.scene.remove(model.previous('mesh'));
           }
+          return model.scene.add(value);
         }
       });
       this.on('hide', function(model) {
         var m;
         if (model.scene && (m = model.get('mesh'))) {
           return model.scene.remove(m);
-        }
-      });
-      this.on('change:color', function(model, value, obj) {
-        var m;
-        if (m = model.get('mesh') && model.get('mesh').material) {
-          return model.get('mesh').material.color = value;
         }
       });
       if (this.get('shown') === void 0) {
@@ -72,44 +64,33 @@
       return geometry;
     };
 
-    Backgrounder.prototype._generateMaterial = function() {
-      new THREE.MeshBasicMaterial({
-        color: this.getColor()
+    Backgrounder.prototype._generateMaterials = function() {
+      var materials;
+      return materials = _.map(this.get('shaders') || [THREE.BgPendingChaosShader], function(shader) {
+        return new THREE.ShaderMaterial(shader);
       });
-      return new THREE.ShaderMaterial(THREE.BgPendingChaosShader);
     };
 
-    Backgrounder.prototype._generateMesh = function() {
-      var mesh;
-      mesh = new THREE.Mesh(this.geometry || this._generateGeometry(), this.material || this._generateMaterial());
-      mesh.position.x = 0;
-      mesh.position.y = 0;
-      mesh.position.z = this.camera.position.z - 150;
-      return mesh;
+    Backgrounder.prototype._generateMeshes = function() {
+      var _this = this;
+      return _.map(this._generateMaterials(), function(material) {
+        var mesh;
+        mesh = new THREE.Mesh(_this.geometry || _this._generateGeometry(), material);
+        mesh.position.x = 0;
+        mesh.position.y = 0;
+        mesh.position.z = _this.camera.position.z - 150;
+        return mesh;
+      });
     };
 
-    Backgrounder.prototype._defaultColor = function() {
-      return 0xffff00;
+    Backgrounder.prototype.allMeshes = function() {
+      return this._all_meshes || (this._all_meshes = this._generateMeshes());
     };
 
-    Backgrounder.prototype.randomizeColor = function() {
-      var clr, hsl, mesh;
-      if (this.get('color')) {
-        clr = this.get('color').clone();
-      }
-      if (mesh = this.get('mesh')) {
-        clr || (clr = mesh.material.color);
-      }
-      clr || (clr = this._defaultColor());
-      hsl = clr.getHSL();
-      clr.setHSL(Math.random(), hsl.s, hsl.l);
+    Backgrounder.prototype.randomize = function() {
       return this.set({
-        color: clr
+        mesh: _.sample(this.allMeshes())
       });
-    };
-
-    Backgrounder.prototype.getColor = function() {
-      return this.get('color') || this._defaultColor();
     };
 
     Backgrounder.prototype.hide = function() {
@@ -126,6 +107,7 @@
 
     Backgrounder.prototype.update = function(opts) {
       var mesh;
+      this.show();
       if (opts.time && (mesh = this.get('mesh'))) {
         return mesh.material.uniforms.time.value = opts.time * 100;
       }

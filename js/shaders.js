@@ -7,6 +7,10 @@
 
 
 (function() {
+  THREE.DefaultVertexShader = "varying vec2 vUv;\n\nvoid main() {\n  vUv = uv;\n  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}";
+
+  THREE.DefaultFragmentShader = "uniform sampler2D tDiffuse;\nvarying vec2 vUv;\n\nvoid main() {\n  gl_FragColor = texture2D(tDiffuse, vUv);\n}";
+
   THREE.CopyShader = {
     uniforms: {
       "tDiffuse": {
@@ -152,7 +156,7 @@
         value: 0.0
       }
     },
-    vertexShader: "varying vec2 vUv;\n\nvoid main() {\n  vUv = uv;\n  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}",
+    vertexShader: THREE.DefaultVertexShader,
     fragmentShader: "uniform sampler2D tDiffuse;\nuniform vec3 color;\nuniform float progress;\n\nvarying vec2 vUv;\n\nvoid main() {\n  vec4 cga = texture2D(tDiffuse, vUv);\n  gl_FragColor = mix(cga, vec4(color, 1.0), progress);\n}"
   };
 
@@ -163,8 +167,19 @@
         value: 0.0
       }
     },
-    vertexShader: "varying vec2 vUv;\n\nvoid main() {\n  vUv = uv;\n  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}",
+    vertexShader: THREE.DefaultVertexShader,
     fragmentShader: "#ifdef GL_ES\nprecision mediump float;\n#endif\n\nuniform float time;\n\nvoid main( void ) {\n  gl_FragColor = vec4(sin(gl_FragCoord.x/2.0+(time*10.0)));\n}"
+  };
+
+  THREE.BgPendingChaosShader2 = {
+    uniforms: {
+      'time': {
+        type: 'f',
+        value: 0.0
+      }
+    },
+    vertexShader: THREE.DefaultVertexShader,
+    fragmentShader: "#ifdef GL_ES\nprecision mediump float;\n#endif\n\nuniform float time;\n\nvoid main( void ) {\n  gl_FragColor = vec4(sin(gl_FragCoord.y/2.0+(time*10.0)));\n}"
   };
 
 }).call(this);

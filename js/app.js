@@ -109,13 +109,15 @@
       });
       this.backgrounder = new Backgrounder({
         scene: this.scene,
-        camera: this.camera
+        camera: this.camera,
+        shaders: [THREE.BgPendingChaosShader, THREE.BgPendingChaosShader2]
       });
       this.timer.on('change:progress', (function(model, value, obj) {
         return this.backgrounder.update({
           time: value
         });
       }), this);
+      this.counter.on('change:idx', this.backgrounder.randomize, this.backgrounder);
       return this.scene;
     };
 

@@ -67,8 +67,12 @@ class @App extends Backbone.Model
 
 			@post_processor.update(fade: {progress: t, color: @counter.nextColor()})
 
-		@backgrounder = new Backgrounder(scene: @scene, camera: @camera)
+		@backgrounder = new Backgrounder(scene: @scene, camera: @camera, shaders: [
+			THREE.BgPendingChaosShader
+			THREE.BgPendingChaosShader2
+		])
 		@timer.on 'change:progress', ((model, value, obj) -> @backgrounder.update(time: value)), this
+		@counter.on 'change:idx', @backgrounder.randomize, @backgrounder
 
 		return @scene
 

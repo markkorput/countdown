@@ -33,7 +33,7 @@ class @Counter extends Backbone.Model
     1.0 / @amount
 
   currentOp: ->
-    @count_ops.at(@get('idx'))
+    @count_ops.at(@get('idx')) || @count_ops.at(@get('idx')-1)
 
   calcIndex: ->
     idx = parseInt(@get('progress')*@amount)

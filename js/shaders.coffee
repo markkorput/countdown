@@ -4,6 +4,25 @@
   Full-screen textured quad shader
 ###
 
+THREE.DefaultVertexShader = """
+  varying vec2 vUv;
+
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+  }
+"""
+
+THREE.DefaultFragmentShader = """
+  uniform sampler2D tDiffuse;
+  varying vec2 vUv;
+
+  void main() {
+    gl_FragColor = texture2D(tDiffuse, vUv);
+  }
+"""
+
+
 THREE.CopyShader =
   uniforms:
     "tDiffuse": { type: "t", value: null } # in Three.js tDiffuse is always passed from the previous Shader in the effect chain
@@ -221,14 +240,7 @@ THREE.FadeShader =
     "color": {type: "c", value: new THREE.Color( 0xFF0000 ) }
     "progress": {type: 'f', value: 0.0}
 
-  vertexShader: """
-    varying vec2 vUv;
-
-    void main() {
-      vUv = uv;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-    }
-  """
+  vertexShader: THREE.DefaultVertexShader
 
   fragmentShader: """
     uniform sampler2D tDiffuse;
@@ -250,14 +262,7 @@ THREE.BgPendingChaosShader =
     'time': {type: 'f', value: 0.0}
   }
 
-  vertexShader: """
-    varying vec2 vUv;
-
-    void main() {
-      vUv = uv;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-    }
-  """
+  vertexShader: THREE.DefaultVertexShader
 
   fragmentShader: """
     #ifdef GL_ES
@@ -271,3 +276,23 @@ THREE.BgPendingChaosShader =
     }
   """
 
+# By @PendingChaos
+
+THREE.BgPendingChaosShader2 =
+  uniforms: {
+    'time': {type: 'f', value: 0.0}
+  }
+
+  vertexShader: THREE.DefaultVertexShader
+
+  fragmentShader: """
+    #ifdef GL_ES
+    precision mediump float;
+    #endif
+
+    uniform float time;
+
+    void main( void ) {
+      gl_FragColor = vec4(sin(gl_FragCoord.y/2.0+(time*10.0)));
+    }
+  """
