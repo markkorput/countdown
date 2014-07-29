@@ -242,3 +242,32 @@ THREE.FadeShader =
       gl_FragColor = mix(cga, vec4(color, 1.0), progress);
     }
   """
+
+# By @PendingChaos
+
+THREE.BgPendingChaosShader =
+  uniforms: {
+    'time': {type: 'f', value: 0.0}
+  }
+
+  vertexShader: """
+    varying vec2 vUv;
+
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+    }
+  """
+
+  fragmentShader: """
+    #ifdef GL_ES
+    precision mediump float;
+    #endif
+
+    uniform float time;
+
+    void main( void ) {
+      gl_FragColor = vec4(sin(gl_FragCoord.x/2.0+(time*10.0)));
+    }
+  """
+

@@ -107,6 +107,15 @@
           }
         });
       });
+      this.backgrounder = new Backgrounder({
+        scene: this.scene,
+        camera: this.camera
+      });
+      this.timer.on('change:progress', (function(model, value, obj) {
+        return this.backgrounder.update({
+          time: value
+        });
+      }), this);
       return this.scene;
     };
 

@@ -56,7 +56,6 @@ class @App extends Backbone.Model
 		@counter = new Counter(scene: @scene, camera: @camera)
 		@timer.on 'change:progress', ((timer, progress, obj) -> @counter.update(progress)), this
 
-
 		@timer.on 'change:progress', (model, value, obj) =>
 			t = (value * 10) - parseInt(value * 10)
 
@@ -68,6 +67,8 @@ class @App extends Backbone.Model
 
 			@post_processor.update(fade: {progress: t, color: @counter.nextColor()})
 
+		@backgrounder = new Backgrounder(scene: @scene, camera: @camera)
+		@timer.on 'change:progress', ((model, value, obj) -> @backgrounder.update(time: value)), this
 
 		return @scene
 
