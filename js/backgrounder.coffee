@@ -97,30 +97,6 @@ BackgroundShaders = ->
     uniform float time;
 
     void main( void ) {
-      gl_FragColor = vec4(sin(gl_FragCoord.x/2.0+(time*10.0)));
-    }
-  """
-
-  @fragmentShaders.push """
-    #ifdef GL_ES
-    precision mediump float;
-    #endif
-
-    uniform float time;
-
-    void main( void ) {
-      gl_FragColor = vec4(sin(gl_FragCoord.y/2.0+(time*10.0)));
-    }
-  """
-
-  @fragmentShaders.push """
-    #ifdef GL_ES
-    precision mediump float;
-    #endif
-
-    uniform float time;
-
-    void main( void ) {
       gl_FragColor = vec4(sin((gl_FragCoord.y + gl_FragCoord.x)/2.0+(time*10.0)));
     }
   """
@@ -133,6 +109,51 @@ BackgroundShaders = ->
     uniform float time;
 
     void main( void ) {
-      gl_FragColor = vec4(sin((gl_FragCoord.y + gl_FragCoord.x)/2.0+(time*10.0)));
+      gl_FragColor = vec4(sin(gl_FragCoord.x/2.0+(time*10.0))) + vec4(sin(gl_FragCoord.y/2.0+(time*10.0)));
+    }
+  """
+
+  @fragmentShaders.push """
+    #ifdef GL_ES
+    precision mediump float;
+    #endif
+
+    uniform float time;
+
+    void main( void ) {
+      gl_FragColor = vec4(sin(length(gl_FragCoord.xy / 200.0) * 96.0 + time * 10.0));
+    }
+  """
+
+  @fragmentShaders.push """
+    #ifdef GL_ES
+    precision mediump float;
+    #endif
+
+    uniform float time;
+
+    vec2 pixelate(vec2 pos, vec2 size) {
+      size = 1000.0/size;
+      return floor(pos * size) / size;
+    }
+
+    float plasma1(vec2 pos) {
+      return sin((10.0*pos.x) + time);
+    }
+
+    float plasma2(vec2 pos) {
+      return sin(10.0*(pos.x*sin(time/2.0) + pos.y*cos(time/3.0)) + time);
+    }
+
+    float plasma3(vec2 pos) {
+      float centerX = pos.x + 0.5*sin(time/5.0);
+      float centerY = pos.y + 0.5*cos(time/3.0);
+      return sin(sqrt(100.0*(centerX*centerX + centerY*centerY) + 1.0) + time);
+    }
+
+    void main( void ) {
+      float wrinkle = cos(gl_FragCoord.y * 0.1 + time * 0.01);
+      float clr = sin(gl_FragCoord.x * 0.7 + wrinkle * 100.0 * sin(time * 0.01));
+      gl_FragColor = vec4(clr);
     }
   """
