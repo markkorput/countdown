@@ -22,28 +22,6 @@ class @Count extends Backbone.Model
       # add existing or newly created mesh to the scene
       model.scene.add mesh if model.scene && mesh
 
-    # (re-)initialize the transformation params everytime when being shown
-    @on 'show', (model) ->
-      model.sourceRotationY = model.sourceRotationZ = Math.PI*0.5
-      model.deltaRotationY = model.deltaRotationZ = Math.PI*-0.5
-
-      randY = Math.random() > 0.5
-      if (model.get('text') + '') == '1' || (model.get('text') + '') == '7'
-        # for the number '1' and number '7' meshes, it otherwise won't look good
-        randZ = randY
-      else
-        randZ = Math.random() > 0.5
-      
-      if randY > 0.5
-        model.sourceRotationY = model.sourceRotationY * -1
-        model.deltaRotationY = model.deltaRotationY * -1
-      if randZ > 0.5
-        model.sourceRotationZ = model.sourceRotationZ * -1
-        model.deltaRotationZ = model.deltaRotationZ * -1
-
-      model.sourceScale = 5
-      model.deltaScale = 1 - model.sourceScale
-
     # when we get a new mesh; make sure the any previous mesh gets removed from the scene
     @on 'change:mesh', (model, value, obj) ->
       if model.scene
@@ -112,26 +90,64 @@ class @Count extends Backbone.Model
 
   getColor: -> @get('color') || @_defaultColor()
 
-  hide: -> @set(shown: false) 
-  
-  # progress should be a number between 0.0 and 1.0 (but this is not really necessary)
-  show: (progress) ->
-    # an attribute change callback will make sure the mesh is created when 'shown' changes to true
-    @set(shown: true)
+  hide: -> @set(shown: false)
+  show: -> @set(shown: true)
 
-    return if !(mesh = @get('mesh'))
-    if progress < 0.1 || progress > 0.9
-      p = progress
-      ry = @sourceRotationY
-      rz = @sourceRotationZ
-      s = @sourceScale
+
+class @CountOps extends Backbone.Model
+  initialize: ->
+    # we EXPECT a target
+    @target = @get('target')
+    @target.on 'destroy', @destroy, this
+
+    # (re-)initialize the transformation params everytime when being shown
+    @target.on 'show', @_initializeSpinscale
+ 
+  destroy: ->
+    @trigger 'destroy', this
+    @target = undefined
+
+  hide: ->
+    @target.hide()
+
+  _initializeSpinscale: (target) ->
+    @spinscale_data = {}
+    @spinscale_data.rotY = @spinscale_data.rotZ = Math.PI*0.5
+    @spinscale_data.deltaRotY = @spinscale_data.deltaRotZ = Math.PI*-0.5
+
+    randY = Math.random() > 0.5
+    if (target.get('text') + '') == '1' || (target.get('text') + '') == '7'
+      # for the number '1' and number '7' meshes, it otherwise won't look good
+      randZ = randY
     else
-      # p = Math.sin(progress * Math.PI/2)
+      randZ = Math.random() > 0.5
+
+    if randY > 0.5
+      @spinscale_data.rotY = @spinscale_data.rotY * -1
+      @spinscale_data.deltaRotY = @spinscale_data.deltaRotY * -1
+    if randZ > 0.5
+      @spinscale_data.rotZ = @spinscale_data.rotZ * -1
+      @spinscale_data.deltaRotZ = @spinscale_data.deltaRotZ * -1
+
+    @spinscale_data.scale = 5
+    @spinscale_data.deltaScale = 1 - @spinscale_data.scale
+
+  # progress should be a number between 0.0 and 1.0 (though this is not 100% necessary)
+  spinscale: (progress) ->
+    @target.show()
+    @_initializeSpinscale(@target) if !@spinscale_data
+
+    mesh = @target.get('mesh')
+
+    if progress < 0.1 || progress > 0.9
+      ry = @spinscale_data.rotY
+      rz = @spinscale_data.rotZ
+      s = @spinscale_data.scale
+    else
       p = (progress - 0.1) / 0.8
-      ry = @sourceRotationY + Math.sin(p * Math.PI) * @deltaRotationY
-      rz = @sourceRotationZ + Math.sin(p * Math.PI) * @deltaRotationZ
-      s = @sourceScale + Math.sin(p * Math.PI) * @deltaScale
-      # s = 2.5 + Math.abs((p - 0.5)) * 2.5
+      ry = @spinscale_data.rotY + Math.sin(p * Math.PI) * @spinscale_data.deltaRotY
+      rz = @spinscale_data.rotZ + Math.sin(p * Math.PI) * @spinscale_data.deltaRotZ
+      s = @spinscale_data.scale + Math.sin(p * Math.PI) * @spinscale_data.deltaScale
 
     mesh.rotation.y = ry
     mesh.rotation.z = rz

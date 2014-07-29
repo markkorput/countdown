@@ -15,29 +15,33 @@
     Counter.prototype.initialize = function() {
       var _this = this;
       this.amount = 10;
-      return this.counts = _.map(_.range(this.amount), function(number, idx, list) {
-        return new Count({
+      return this.count_ops = _.map(_.range(this.amount), function(number, idx, list) {
+        var count, count_op;
+        count = new Count({
           scene: _this.get('scene'),
           camera: _this.get('camera'),
           text: number
+        });
+        return count_op = new CountOps({
+          target: count
         });
       });
     };
 
     Counter.prototype.update = function(progress) {
-      var count, idx, sublength;
+      var idx, op, sublength;
       this.set({
         progress: progress
       });
       idx = this.currentIndex();
-      _.each(this.counts, function(count, i) {
+      _.each(this.count_ops, function(op, i) {
         if (i !== idx) {
-          return count.hide();
+          return op.hide();
         }
       });
-      count = this.counts[idx];
+      op = this.count_ops[idx];
       sublength = 1.0 / this.amount;
-      return count.show((progress - sublength * idx) / sublength);
+      return op.spinscale((progress - sublength * idx) / sublength);
     };
 
     Counter.prototype.currentIndex = function() {
@@ -55,7 +59,7 @@
     };
 
     Counter.prototype.nextColor = function() {
-      return this.counts[this.nextIndex()].getColor();
+      return this.count_ops[this.nextIndex()].get('target').getColor();
     };
 
     return Counter;

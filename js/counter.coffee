@@ -2,9 +2,10 @@ class @Counter extends Backbone.Model
   initialize: ->
     @amount = 10
 
-    @counts = _.map _.range(@amount), (number, idx, list) =>
+    @count_ops = _.map _.range(@amount), (number, idx, list) =>
       # create count animation
-      new Count(scene: @get('scene'), camera: @get('camera'), text: number)
+      count = new Count(scene: @get('scene'), camera: @get('camera'), text: number)
+      count_op = new CountOps(target: count)
 
   update: (progress) ->
     @set(progress: progress)
@@ -13,16 +14,16 @@ class @Counter extends Backbone.Model
     idx = @currentIndex()
 
     # hide all count numbers
-    _.each @counts, (count, i) -> count.hide() if i != idx
+    _.each @count_ops, (op, i) -> op.hide() if i != idx
 
     # get count object of current number
-    count = @counts[idx]
+    op = @count_ops[idx]
 
     # length within progress range 0.0 - 1.0 for one count
     sublength = 1.0 / @amount
 
     # update current number
-    count.show((progress - sublength * idx) / sublength)
+    op.spinscale((progress - sublength * idx) / sublength)
 
   currentIndex: ->
     idx = parseInt(@get('progress')*@amount)
@@ -33,4 +34,4 @@ class @Counter extends Backbone.Model
     return idx
 
   nextColor: ->
-    @counts[@nextIndex()].getColor()
+    @count_ops[@nextIndex()].get('target').getColor()
