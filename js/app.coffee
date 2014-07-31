@@ -9,7 +9,11 @@ class @App extends Backbone.Model
 		@controls.on 'toggle-playing', ((playing)-> @set(paused: !playing)), this
 		@controls.on 'duration', ((value) -> @timer.set(duration: parseInt(value))), this
 
-		@on 'change:paused', ((app, paused, obj) -> @timer.setPaused(paused)), this
+		@on 'change:paused', ((app, paused, obj) ->
+			@timer.setPaused(paused)
+			@update() if !paused
+
+		), this
 
 		@timer = new Timer(duration: 20000)
 		@timer.start()
@@ -74,12 +78,12 @@ class @App extends Backbone.Model
 		return @scene
 
 	update: ->
+		return if @get('paused') == true
+		@trigger 'update'
+
 		requestAnimationFrame =>
 			@update()
 			@draw()
-
-		return if @get('paused') == true
-		@trigger 'update'
 
 	draw: ->
 		if @post_processor

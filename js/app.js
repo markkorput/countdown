@@ -37,7 +37,10 @@
         });
       }), this);
       this.on('change:paused', (function(app, paused, obj) {
-        return this.timer.setPaused(paused);
+        this.timer.setPaused(paused);
+        if (!paused) {
+          return this.update();
+        }
       }), this);
       this.timer = new Timer({
         duration: 20000
@@ -122,14 +125,14 @@
 
     App.prototype.update = function() {
       var _this = this;
-      requestAnimationFrame(function() {
-        _this.update();
-        return _this.draw();
-      });
       if (this.get('paused') === true) {
         return;
       }
-      return this.trigger('update');
+      this.trigger('update');
+      return requestAnimationFrame(function() {
+        _this.update();
+        return _this.draw();
+      });
     };
 
     App.prototype.draw = function() {
