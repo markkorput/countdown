@@ -1,6 +1,3 @@
-class CountCollection extends Backbone.Collection
-  model: Count
-
 class @Counter extends Backbone.Model
   initialize: ->
     @amount = 10
@@ -10,7 +7,7 @@ class @Counter extends Backbone.Model
       count = new Count(scene: @get('scene'), camera: @get('camera'), text: number)
       count_op = new CountOps(target: count)
 
-    @count_ops = new CountCollection(count_ops_array)
+    @count_ops = new Backbone.Collection(count_ops_array)
 
     # @grids = _.map @count_ops, (op, idx, list) =>
     #   grid = new CountGrid(scene: @get('scene'), camera: @get('camera'), count: op.target)
@@ -19,7 +16,8 @@ class @Counter extends Backbone.Model
       model.set(idx: @calcIndex())
 
       # update current number
-      model.currentOp().spinscale((value - model.countLength() * model.get('idx')) / model.countLength())
+      # model.currentOp().spinscale((value - model.countLength() * model.get('idx')) / model.countLength())
+      model.currentOp().fall((value - model.countLength() * model.get('idx')) / model.countLength())
 
     @on 'change:idx', (model, value, obj) ->
       # hide all other count numbers

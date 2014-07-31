@@ -101,7 +101,8 @@ class @CountOps extends Backbone.Model
     @target.on 'destroy', @destroy, this
 
     # (re-)initialize the transformation params everytime when being shown
-    @target.on 'show', @_initializeSpinscale
+    @target.on 'show', @_initializeSpinscale, this
+    @target.on 'show', @_initializeFall, this
  
   destroy: ->
     @trigger 'destroy', this
@@ -135,9 +136,7 @@ class @CountOps extends Backbone.Model
   # progress should be a number between 0.0 and 1.0 (though this is not 100% necessary)
   spinscale: (progress) ->
     @target.show()
-    @_initializeSpinscale(@target) if !@spinscale_data
-
-    mesh = @target.get('mesh')
+    @_initializeSpinscale(@target) if !@spinscale_data    
 
     if progress < 0.1 || progress > 0.9
       ry = @spinscale_data.rotY
@@ -149,14 +148,47 @@ class @CountOps extends Backbone.Model
       rz = @spinscale_data.rotZ + Math.sin(p * Math.PI) * @spinscale_data.deltaRotZ
       s = @spinscale_data.scale + Math.sin(p * Math.PI) * @spinscale_data.deltaScale
 
+    mesh = @target.get('mesh')
     mesh.rotation.y = ry
     mesh.rotation.z = rz
     mesh.scale = new THREE.Vector3(s,s,s)
 
+  _initializeFall: (target) ->
+    @fall_data = {}
+    @fall_data.rotY = @fall_data.rotZ = Math.PI*0.5
+    @fall_data.endRotY = @fall_data.endRotZ = 0
 
+    randY = Math.random() > 0.5
+    if (target.get('text') + '') == '1' || (target.get('text') + '') == '7'
+      # for the number '1' and number '7' meshes, it otherwise won't look good
+      randZ = randY
+    else
+      randZ = Math.random() > 0.5
 
+    @fall_data.endRotY = @fall_data.endRotY * -1 if randY > 0.5
+    @fall_data.endRotZ = @fall_data.endRotZ * -1 if randZ > 0.5
+    @fall_data.startScale = 5
+    @fall_data.endScale = 0.001
 
+  fall: (progress) ->
+    @target.show()
+    @_initializeFall(@target) if !@fall_data
 
+    if progress < 0.1
+      s = @fall_data.startScale
+      ry = @fall_data.rotY
+      rz = @fall_data.rotZ
+    else if progress > 0.9
+      s = @fall_data.endScale
+      ry = @fall_data.endRotY
+      ry = @fall_data.endRotZ
+    else
+      p = (progress - 0.1) / 0.8
+      s = @fall_data.startScale + (@fall_data.endScale - @fall_data.startScale) * p
+      ry = @fall_data.rotY + (@fall_data.endRotY - @fall_data.rotY) * p
+      rz = @fall_data.rotZ + (@fall_data.endRotZ - @fall_data.rotZ) * p
 
-
-
+    mesh = @target.get('mesh')
+    mesh.rotation.y = ry
+    mesh.rotation.z = rz
+    mesh.scale = new THREE.Vector3(s,s,s)

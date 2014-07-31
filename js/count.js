@@ -148,7 +148,8 @@
     CountOps.prototype.initialize = function() {
       this.target = this.get('target');
       this.target.on('destroy', this.destroy, this);
-      return this.target.on('show', this._initializeSpinscale);
+      this.target.on('show', this._initializeSpinscale, this);
+      return this.target.on('show', this._initializeFall, this);
     };
 
     CountOps.prototype.destroy = function() {
@@ -189,7 +190,6 @@
       if (!this.spinscale_data) {
         this._initializeSpinscale(this.target);
       }
-      mesh = this.target.get('mesh');
       if (progress < 0.1 || progress > 0.9) {
         ry = this.spinscale_data.rotY;
         rz = this.spinscale_data.rotZ;
@@ -200,6 +200,54 @@
         rz = this.spinscale_data.rotZ + Math.sin(p * Math.PI) * this.spinscale_data.deltaRotZ;
         s = this.spinscale_data.scale + Math.sin(p * Math.PI) * this.spinscale_data.deltaScale;
       }
+      mesh = this.target.get('mesh');
+      mesh.rotation.y = ry;
+      mesh.rotation.z = rz;
+      return mesh.scale = new THREE.Vector3(s, s, s);
+    };
+
+    CountOps.prototype._initializeFall = function(target) {
+      var randY, randZ;
+      this.fall_data = {};
+      this.fall_data.rotY = this.fall_data.rotZ = Math.PI * 0.5;
+      this.fall_data.endRotY = this.fall_data.endRotZ = 0;
+      randY = Math.random() > 0.5;
+      if ((target.get('text') + '') === '1' || (target.get('text') + '') === '7') {
+        randZ = randY;
+      } else {
+        randZ = Math.random() > 0.5;
+      }
+      if (randY > 0.5) {
+        this.fall_data.endRotY = this.fall_data.endRotY * -1;
+      }
+      if (randZ > 0.5) {
+        this.fall_data.endRotZ = this.fall_data.endRotZ * -1;
+      }
+      this.fall_data.startScale = 5;
+      return this.fall_data.endScale = 0.001;
+    };
+
+    CountOps.prototype.fall = function(progress) {
+      var mesh, p, ry, rz, s;
+      this.target.show();
+      if (!this.fall_data) {
+        this._initializeFall(this.target);
+      }
+      if (progress < 0.1) {
+        s = this.fall_data.startScale;
+        ry = this.fall_data.rotY;
+        rz = this.fall_data.rotZ;
+      } else if (progress > 0.9) {
+        s = this.fall_data.endScale;
+        ry = this.fall_data.endRotY;
+        ry = this.fall_data.endRotZ;
+      } else {
+        p = (progress - 0.1) / 0.8;
+        s = this.fall_data.startScale + (this.fall_data.endScale - this.fall_data.startScale) * p;
+        ry = this.fall_data.rotY + (this.fall_data.endRotY - this.fall_data.rotY) * p;
+        rz = this.fall_data.rotZ + (this.fall_data.endRotZ - this.fall_data.rotZ) * p;
+      }
+      mesh = this.target.get('mesh');
       mesh.rotation.y = ry;
       mesh.rotation.z = rz;
       return mesh.scale = new THREE.Vector3(s, s, s);

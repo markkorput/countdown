@@ -84,6 +84,13 @@
         speed: 0,
         rotation_speed: 0.0
       });
+      this.counter = new Counter({
+        scene: this.scene,
+        camera: this.camera
+      });
+      this.timer.on('change:progress', (function(timer, progress, obj) {
+        return this.counter.update(progress);
+      }), this);
       this.timer.on('change:progress', function(model, value, obj) {
         var t;
         t = (value * 10) - parseInt(value * 10);

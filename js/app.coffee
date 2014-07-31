@@ -57,8 +57,8 @@ class @App extends Backbone.Model
 		# @post_processor = new PostProcessor(renderer: @renderer, camera: @camera, scene: @scene)
 		# @on 'update', (-> @post_processor.update()), this
 
-		# @counter = new Counter(scene: @scene, camera: @camera)
-		# @timer.on 'change:progress', ((timer, progress, obj) -> @counter.update(progress)), this
+		@counter = new Counter(scene: @scene, camera: @camera)
+		@timer.on 'change:progress', ((timer, progress, obj) -> @counter.update(progress)), this
 
 		@timer.on 'change:progress', (model, value, obj) =>
 			t = (value * 10) - parseInt(value * 10)
