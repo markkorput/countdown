@@ -32,16 +32,15 @@ class @Counter extends Backbone.Model
   countLength: ->
     1.0 / @amount
 
-  currentOp: ->
-    @count_ops.at(@get('idx')) || @count_ops.at(@get('idx')-1)
-
   calcIndex: ->
     idx = parseInt(@get('progress')*@amount)
 
   nextIndex: ->
-    idx = @get('idx') || @calcIndex() + 1
+    idx = (@get('idx') || @calcIndex()) + 1
     idx = 0 if idx >= @amount
     return idx
 
-  nextColor: ->
-    @count_ops.at(@nextIndex()).get('target').getColor()
+  currentOp: -> @count_ops.at(@get('idx')) || @count_ops.at(@get('idx')-1)
+  nextOp: -> @count_ops.at(@nextIndex()) || @count_ops.at(@nextIndex()-1)
+  currentColor: -> @currentOp().get('target').getColor()
+  nextColor: -> @nextOp().get('target').getColor()

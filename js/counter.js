@@ -67,10 +67,6 @@
       return 1.0 / this.amount;
     };
 
-    Counter.prototype.currentOp = function() {
-      return this.count_ops.at(this.get('idx')) || this.count_ops.at(this.get('idx') - 1);
-    };
-
     Counter.prototype.calcIndex = function() {
       var idx;
       return idx = parseInt(this.get('progress') * this.amount);
@@ -78,15 +74,27 @@
 
     Counter.prototype.nextIndex = function() {
       var idx;
-      idx = this.get('idx') || this.calcIndex() + 1;
+      idx = (this.get('idx') || this.calcIndex()) + 1;
       if (idx >= this.amount) {
         idx = 0;
       }
       return idx;
     };
 
+    Counter.prototype.currentOp = function() {
+      return this.count_ops.at(this.get('idx')) || this.count_ops.at(this.get('idx') - 1);
+    };
+
+    Counter.prototype.nextOp = function() {
+      return this.count_ops.at(this.nextIndex()) || this.count_ops.at(this.nextIndex() - 1);
+    };
+
+    Counter.prototype.currentColor = function() {
+      return this.currentOp().get('target').getColor();
+    };
+
     Counter.prototype.nextColor = function() {
-      return this.count_ops.at(this.nextIndex()).get('target').getColor();
+      return this.nextOp().get('target').getColor();
     };
 
     return Counter;
