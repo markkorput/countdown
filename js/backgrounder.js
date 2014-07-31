@@ -133,7 +133,7 @@
     };
     this.vertexShader = THREE.DefaultVertexShader;
     this.fragmentShaders = [];
-    this.fragmentShaders.push("#ifdef GL_ES\nprecision mediump float;\n#endif\n\nuniform float time;\n\nvoid main( void ) {\n  gl_FragColor = vec4(sin((gl_FragCoord.y + gl_FragCoord.x)/2.0+(time*10.0)));\n}");
+    this.fragmentShaders.push("#ifdef GL_ES\nprecision mediump float;\n#endif\n\nuniform float time;\n\nvoid main( void ) {\n  gl_FragColor = vec4(1.0 - sin((gl_FragCoord.y + gl_FragCoord.x)/2.0+(time*10.0)));\n}");
     this.fragmentShaders.push("#ifdef GL_ES\nprecision mediump float;\n#endif\n\nuniform float time;\n\nvoid main( void ) {\n  gl_FragColor = vec4(sin(gl_FragCoord.x/2.0+(time*10.0))) + vec4(sin(gl_FragCoord.y/2.0+(time*10.0)));\n}");
     this.fragmentShaders.push("#ifdef GL_ES\nprecision mediump float;\n#endif\n\nuniform float time;\n\nvoid main( void ) {\n  gl_FragColor = vec4(sin(length(gl_FragCoord.xy / 200.0) * 96.0 + time * 10.0));\n}");
     return this.fragmentShaders.push("#ifdef GL_ES\nprecision mediump float;\n#endif\n\nuniform float time;\n\nvec2 pixelate(vec2 pos, vec2 size) {\n  size = 1000.0/size;\n  return floor(pos * size) / size;\n}\n\nfloat plasma1(vec2 pos) {\n  return sin((10.0*pos.x) + time);\n}\n\nfloat plasma2(vec2 pos) {\n  return sin(10.0*(pos.x*sin(time/2.0) + pos.y*cos(time/3.0)) + time);\n}\n\nfloat plasma3(vec2 pos) {\n  float centerX = pos.x + 0.5*sin(time/5.0);\n  float centerY = pos.y + 0.5*cos(time/3.0);\n  return sin(sqrt(100.0*(centerX*centerX + centerY*centerY) + 1.0) + time);\n}\n\nvoid main( void ) {\n  float wrinkle = cos(gl_FragCoord.y * 0.1 + time * 0.01);\n  float clr = sin(gl_FragCoord.x * 0.7 + wrinkle * 100.0 * sin(time * 0.01));\n  gl_FragColor = vec4(clr);\n}");

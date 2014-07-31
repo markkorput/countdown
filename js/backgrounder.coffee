@@ -97,7 +97,7 @@ BackgroundShaders = ->
     uniform float time;
 
     void main( void ) {
-      gl_FragColor = vec4(sin((gl_FragCoord.y + gl_FragCoord.x)/2.0+(time*10.0)));
+      gl_FragColor = vec4(1.0 - sin((gl_FragCoord.y + gl_FragCoord.x)/2.0+(time*10.0)));
     }
   """
 
