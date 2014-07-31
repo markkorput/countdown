@@ -17,7 +17,13 @@
     };
 
     App.prototype.init = function() {
-      this.controls = new Controls();
+      this.timer = new Timer({
+        duration: 20000
+      });
+      this.timer.start();
+      this.controls = new Controls({
+        duration: this.timer.get('duration')
+      });
       this.controls.on('toggle-loop', (function(value) {
         return this.timer.set({
           loop: value
@@ -42,10 +48,6 @@
           return this.update();
         }
       }), this);
-      this.timer = new Timer({
-        duration: 20000
-      });
-      this.timer.start();
       this.timer.on('change:progress', (function(timer, progress, obj) {
         return this.controls.data.timeline = progress * 100;
       }), this);
@@ -82,44 +84,16 @@
         speed: 0,
         rotation_speed: 0.0
       });
-      this.post_processor = new PostProcessor({
-        renderer: this.renderer,
-        camera: this.camera,
-        scene: this.scene
-      });
-      this.counter = new Counter({
-        scene: this.scene,
-        camera: this.camera
-      });
-      this.timer.on('change:progress', (function(timer, progress, obj) {
-        return this.counter.update(progress);
-      }), this);
       this.timer.on('change:progress', function(model, value, obj) {
         var t;
         t = (value * 10) - parseInt(value * 10);
         if (t >= 0.9) {
           t -= 0.9;
-          t = t / 0.1;
+          return t = t / 0.1;
         } else {
-          t = 0.0;
+          return t = 0.0;
         }
-        return _this.post_processor.update({
-          fade: {
-            progress: t,
-            color: _this.counter.nextColor()
-          }
-        });
       });
-      this.backgrounder = new Backgrounder({
-        scene: this.scene,
-        camera: this.camera
-      });
-      this.timer.on('change:progress', (function(model, value, obj) {
-        return this.backgrounder.update({
-          time: value
-        });
-      }), this);
-      this.counter.on('change:idx', this.backgrounder.randomize, this.backgrounder);
       return this.scene;
     };
 

@@ -1,9 +1,5 @@
 class @Controls extends Backbone.Model
-	constructor: (_opts) ->
-		@options = _opts
-		@init()
-
-	init: ->
+	initialize:  ->
 		@destroy()
 
 		$(document).on 'mousedown', @mousedown
@@ -11,12 +7,12 @@ class @Controls extends Backbone.Model
 
 		@gui = new dat.GUI()
 
-		@data = new ->
+		@data = new ((model) ->
 			# @Stripes = => 
 			@timeline = 0
 			@loop = true
 			@playing = true
-			@duration = 10000
+			@duration = model.get('duration') || 10000)(this)
 
 		folder = @gui.addFolder 'Animation'
 		folder.open()

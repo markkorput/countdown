@@ -3,7 +3,10 @@ class @App extends Backbone.Model
 		@init()
 
 	init: ->
-		@controls = new Controls()
+		@timer = new Timer(duration: 20000)
+		@timer.start()
+
+		@controls = new Controls(duration: @timer.get('duration'))
 		@controls.on 'toggle-loop', ((value) -> @timer.set(loop: value).start()), this
 		@controls.on 'timeline', ((value) -> @timer.setProgress(value)), this
 		@controls.on 'toggle-playing', ((playing)-> @set(paused: !playing)), this
@@ -12,11 +15,8 @@ class @App extends Backbone.Model
 		@on 'change:paused', ((app, paused, obj) ->
 			@timer.setPaused(paused)
 			@update() if !paused
-
 		), this
 
-		@timer = new Timer(duration: 20000)
-		@timer.start()
 		@timer.on 'change:progress', ((timer, progress, obj) -> @controls.data.timeline = progress * 100), this
 		@on 'update', @timer.update, @timer
 
@@ -54,11 +54,11 @@ class @App extends Backbone.Model
 		@camera_operator = new CameraOperator(camera: @camera, scene: @scene, speed: 0, rotation_speed: 0.0)
 		# @on 'update', (-> @camera_operator.update()), this
 
-		@post_processor = new PostProcessor(renderer: @renderer, camera: @camera, scene: @scene)
+		# @post_processor = new PostProcessor(renderer: @renderer, camera: @camera, scene: @scene)
 		# @on 'update', (-> @post_processor.update()), this
 
-		@counter = new Counter(scene: @scene, camera: @camera)
-		@timer.on 'change:progress', ((timer, progress, obj) -> @counter.update(progress)), this
+		# @counter = new Counter(scene: @scene, camera: @camera)
+		# @timer.on 'change:progress', ((timer, progress, obj) -> @counter.update(progress)), this
 
 		@timer.on 'change:progress', (model, value, obj) =>
 			t = (value * 10) - parseInt(value * 10)
@@ -69,11 +69,11 @@ class @App extends Backbone.Model
 			else
 				t = 0.0
 
-			@post_processor.update(fade: {progress: t, color: @counter.nextColor()})
+			# @post_processor.update(fade: {progress: t, color: @counter.nextColor()})
 
-		@backgrounder = new Backgrounder(scene: @scene, camera: @camera)
-		@timer.on 'change:progress', ((model, value, obj) -> @backgrounder.update(time: value)), this
-		@counter.on 'change:idx', @backgrounder.randomize, @backgrounder
+		# @backgrounder = new Backgrounder(scene: @scene, camera: @camera)
+		# @timer.on 'change:progress', ((model, value, obj) -> @backgrounder.update(time: value)), this
+		# @counter.on 'change:idx', @backgrounder.randomize, @backgrounder
 
 		return @scene
 
