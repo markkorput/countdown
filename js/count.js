@@ -242,7 +242,7 @@
         ry = this.fall_data.endRotY;
         ry = this.fall_data.endRotZ;
       } else {
-        p = (progress - 0.1) / 0.8;
+        p = (Math.sin((progress - 0.1) / 0.8 * Math.PI * 0.5) + (1 - Math.sin((progress - 0.1) / 0.8 * Math.PI * 0.5))) * 0.5;
         s = this.fall_data.startScale + (this.fall_data.endScale - this.fall_data.startScale) * p;
         ry = this.fall_data.rotY + (this.fall_data.endRotY - this.fall_data.rotY) * p;
         rz = this.fall_data.rotZ + (this.fall_data.endRotZ - this.fall_data.rotZ) * p;

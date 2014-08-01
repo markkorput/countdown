@@ -183,7 +183,7 @@ class @CountOps extends Backbone.Model
       ry = @fall_data.endRotY
       ry = @fall_data.endRotZ
     else
-      p = (progress - 0.1) / 0.8
+      p = (Math.sin((progress - 0.1) / 0.8 * Math.PI * 0.5) + (1 - Math.sin((progress - 0.1) / 0.8 * Math.PI * 0.5))) * 0.5
       s = @fall_data.startScale + (@fall_data.endScale - @fall_data.startScale) * p
       ry = @fall_data.rotY + (@fall_data.endRotY - @fall_data.rotY) * p
       rz = @fall_data.rotZ + (@fall_data.endRotZ - @fall_data.rotZ) * p
