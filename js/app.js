@@ -59,7 +59,9 @@
 
     App.prototype._initVfx = function() {
       this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-      this.renderer = new THREE.WebGLRenderer();
+      this.renderer = new THREE.WebGLRenderer({
+        alpha: true
+      });
       this._resize();
       window.addEventListener('resize', this._resize, false);
       return document.body.appendChild(this.renderer.domElement);
@@ -76,7 +78,6 @@
     };
 
     App.prototype._createScene = function() {
-      var _this = this;
       this.scene = new THREE.Scene();
       this.camera_operator = new CameraOperator({
         camera: this.camera,
@@ -91,16 +92,9 @@
       this.timer.on('change:progress', (function(timer, progress, obj) {
         return this.counter.update(progress);
       }), this);
-      this.timer.on('change:progress', function(model, value, obj) {
-        var t;
-        t = (value * 10) - parseInt(value * 10);
-        if (t >= 0.9) {
-          t -= 0.9;
-          return t = t / 0.1;
-        } else {
-          return t = 0.0;
-        }
-      });
+      this.counter.on('change:idx', (function(model, value, obj) {
+        return this.renderer.setClearColor(model.nextColor());
+      }), this);
       return this.scene;
     };
 

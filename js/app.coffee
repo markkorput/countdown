@@ -28,7 +28,7 @@ class @App extends Backbone.Model
 		@camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000)
 
 		# @renderer = new THREE.CanvasRenderer()
-		@renderer = new THREE.WebGLRenderer() #({preserveDrawingBuffer: true}) # preserveDrawingBuffer: true allows for image exports, but has some performance implications
+		@renderer = new THREE.WebGLRenderer(alpha: true) #({preserveDrawingBuffer: true}) # preserveDrawingBuffer: true allows for image exports, but has some performance implications
 
 		# perform window-size based configuration
 		@_resize()
@@ -60,16 +60,19 @@ class @App extends Backbone.Model
 		@counter = new Counter(scene: @scene, camera: @camera)
 		@timer.on 'change:progress', ((timer, progress, obj) -> @counter.update(progress)), this
 
-		@timer.on 'change:progress', (model, value, obj) =>
-			t = (value * 10) - parseInt(value * 10)
+		# @timer.on 'change:progress', (model, value, obj) =>
+		# 	t = (value * 10) - parseInt(value * 10)
 
-			if t >= 0.9
-				t -= 0.9
-				t = t / 0.1
-			else
-				t = 0.0
+		# 	if t >= 0.9
+		# 		t -= 0.9
+		# 		t = t / 0.1
+		# 	else
+		# 		t = 0.0
 
-			# @post_processor.update(fade: {progress: t, color: @counter.nextColor()})
+		# 	@post_processor.update(fade: {progress: t, color: @counter.nextColor()})
+
+		# change the background color to the next count's color
+		@counter.on 'change:idx', ((model, value, obj) -> @renderer.setClearColor(model.nextColor())), this
 
 		# @backgrounder = new Backgrounder(scene: @scene, camera: @camera)
 		# @timer.on 'change:progress', ((model, value, obj) -> @backgrounder.update(time: value)), this

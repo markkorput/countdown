@@ -4,6 +4,9 @@ class @Count extends Backbone.Model
     @scene = @get('scene')
     @camera = @get('camera')
 
+    # extra; randomize color when hiding, so next time it's shown, it has a different color
+    @randomizeColor()
+
     #
     # create event hooks
     #
@@ -14,9 +17,6 @@ class @Count extends Backbone.Model
 
     # make sure we have a mesh when being shown
     @on 'show', (model) ->
-      # extra; randomize color when hiding, so next time it's shown, it has a different color
-      model.randomizeColor()
-
       # if mesh DOESN'T already exist; generate mesh first
       if !(mesh = model.get('mesh')) 
         mesh = model._generateMesh()

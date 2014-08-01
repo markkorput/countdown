@@ -16,6 +16,7 @@
       this.destroy();
       this.scene = this.get('scene');
       this.camera = this.get('camera');
+      this.randomizeColor();
       this.on('change:shown', function(model, value, obj) {
         return model.trigger({
           "true": 'show',
@@ -24,7 +25,6 @@
       });
       this.on('show', function(model) {
         var mesh;
-        model.randomizeColor();
         if (!(mesh = model.get('mesh'))) {
           mesh = model._generateMesh();
           model.set({
