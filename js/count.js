@@ -233,20 +233,10 @@
       if (!this.fall_data) {
         this._initializeFall(this.target);
       }
-      if (progress < 0.1) {
-        s = this.fall_data.startScale;
-        ry = this.fall_data.rotY;
-        rz = this.fall_data.rotZ;
-      } else if (progress > 0.9) {
-        s = this.fall_data.endScale;
-        ry = this.fall_data.endRotY;
-        ry = this.fall_data.endRotZ;
-      } else {
-        p = 1 - Math.sin((progress - 0.1) / 0.8 * Math.PI * 0.5 + Math.PI * 0.5);
-        s = this.fall_data.startScale + (this.fall_data.endScale - this.fall_data.startScale) * p;
-        ry = this.fall_data.rotY + (this.fall_data.endRotY - this.fall_data.rotY) * p;
-        rz = this.fall_data.rotZ + (this.fall_data.endRotZ - this.fall_data.rotZ) * p;
-      }
+      p = progress;
+      s = this.fall_data.startScale + (this.fall_data.endScale - this.fall_data.startScale) * p;
+      ry = this.fall_data.rotY + (this.fall_data.endRotY - this.fall_data.rotY) * p;
+      rz = this.fall_data.rotZ + (this.fall_data.endRotZ - this.fall_data.rotZ) * p;
       mesh = this.target.get('mesh');
       mesh.rotation.y = ry;
       mesh.rotation.z = rz;

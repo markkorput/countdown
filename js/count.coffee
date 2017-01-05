@@ -174,19 +174,10 @@ class @CountOps extends Backbone.Model
     @target.show()
     @_initializeFall(@target) if !@fall_data
 
-    if progress < 0.1
-      s = @fall_data.startScale
-      ry = @fall_data.rotY
-      rz = @fall_data.rotZ
-    else if progress > 0.9
-      s = @fall_data.endScale
-      ry = @fall_data.endRotY
-      ry = @fall_data.endRotZ
-    else
-      p = 1-Math.sin((progress - 0.1) / 0.8 * Math.PI * 0.5 + Math.PI * 0.5)
-      s = @fall_data.startScale + (@fall_data.endScale - @fall_data.startScale) * p
-      ry = @fall_data.rotY + (@fall_data.endRotY - @fall_data.rotY) * p
-      rz = @fall_data.rotZ + (@fall_data.endRotZ - @fall_data.rotZ) * p
+    p = progress
+    s = @fall_data.startScale + (@fall_data.endScale - @fall_data.startScale) * p
+    ry = @fall_data.rotY + (@fall_data.endRotY - @fall_data.rotY) * p
+    rz = @fall_data.rotZ + (@fall_data.endRotZ - @fall_data.rotZ) * p
 
     mesh = @target.get('mesh')
     mesh.rotation.y = ry
