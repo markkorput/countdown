@@ -4,6 +4,25 @@
   Full-screen textured quad shader
 ###
 
+THREE.DefaultVertexShader = """
+  varying vec2 vUv;
+
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+  }
+"""
+
+THREE.DefaultFragmentShader = """
+  uniform sampler2D tDiffuse;
+  varying vec2 vUv;
+
+  void main() {
+    gl_FragColor = texture2D(tDiffuse, vUv);
+  }
+"""
+
+
 THREE.CopyShader =
   uniforms:
     "tDiffuse": { type: "t", value: null } # in Three.js tDiffuse is always passed from the previous Shader in the effect chain
@@ -159,3 +178,79 @@ THREE.RGBShiftShader = {
     }
   """
 };
+
+
+###
+  @author markkorput / http://markkorput.github.com/
+
+  A blinds effect  
+
+  progress: float value between 0.0 and 1.0, 0.0 meaning no blinds, 1.0 meaning blinds all shut
+  color: blinds color
+###
+
+
+
+THREE.BlindsShader =
+  uniforms:
+    # type 'texture' uniform, passed by Three.js; contains the bitmap of previous shader
+    "tDiffuse": { type: "t", value: null },
+    "color": {type: "c", value: new THREE.Color( 0xFF0000 ) }
+    "progress": {type: 'f', value: 0.0}
+    "amount": {type: 'i', value: 10}
+
+  vertexShader: """
+    varying vec2 vUv;
+
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+    }
+  """
+
+  fragmentShader: """
+    uniform sampler2D tDiffuse;
+    uniform vec3 color;
+    uniform float progress;
+
+    varying vec2 vUv;
+
+    void main() {
+      vec4 cga = texture2D(tDiffuse, vUv);
+      if(vUv.y < progress) cga = vec4( color, 1.0 );
+      gl_FragColor = cga;
+    }
+  """
+
+###
+  @author markkorput / http://markkorput.github.com/
+
+  A blinds effect  
+
+  progress: float value between 0.0 and 1.0, 0.0 meaning no blinds, 1.0 meaning blinds all shut
+  color: blinds color
+###
+
+
+
+THREE.FadeShader =
+  uniforms:
+    # type 'texture' uniform, passed by Three.js; contains the bitmap of previous shader
+    "tDiffuse": { type: "t", value: null },
+    "color": {type: "c", value: new THREE.Color( 0xFF0000 ) }
+    "progress": {type: 'f', value: 0.0}
+
+  vertexShader: THREE.DefaultVertexShader
+
+  fragmentShader: """
+    uniform sampler2D tDiffuse;
+    uniform vec3 color;
+    uniform float progress;
+
+    varying vec2 vUv;
+
+    void main() {
+      vec4 cga = texture2D(tDiffuse, vUv);
+      gl_FragColor = mix(cga, vec4(color, 1.0), progress);
+    }
+  """

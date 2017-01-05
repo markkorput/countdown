@@ -31,11 +31,19 @@
           paused: !playing
         });
       }), this);
+      this.controls.on('duration', (function(value) {
+        return this.timer.set({
+          duration: parseInt(value)
+        });
+      }), this);
       this.on('change:paused', (function(app, paused, obj) {
-        return this.timer.setPaused(paused);
+        this.timer.setPaused(paused);
+        if (!paused) {
+          return this.update();
+        }
       }), this);
       this.timer = new Timer({
-        duration: 10000
+        duration: 20000
       });
       this.timer.start();
       this.timer.on('change:progress', (function(timer, progress, obj) {
@@ -51,7 +59,7 @@
       this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
       this.renderer = new THREE.WebGLRenderer();
       this._resize();
-      $(window).resize(this._resize);
+      window.addEventListener('resize', this._resize, false);
       return document.body.appendChild(this.renderer.domElement);
     };
 
@@ -74,35 +82,57 @@
         speed: 0,
         rotation_speed: 0.0
       });
-      this.counts = _.map(_.range(10), function(number, idx, list) {
-        return new Count({
-          scene: _this.scene,
-          camera: _this.camera,
-          text: number
+      this.post_processor = new PostProcessor({
+        renderer: this.renderer,
+        camera: this.camera,
+        scene: this.scene
+      });
+      this.counter = new Counter({
+        scene: this.scene,
+        camera: this.camera
+      });
+      this.timer.on('change:progress', (function(timer, progress, obj) {
+        return this.counter.update(progress);
+      }), this);
+      this.timer.on('change:progress', function(model, value, obj) {
+        var t;
+        t = (value * 10) - parseInt(value * 10);
+        if (t >= 0.9) {
+          t -= 0.9;
+          t = t / 0.1;
+        } else {
+          t = 0.0;
+        }
+        return _this.post_processor.update({
+          fade: {
+            progress: t,
+            color: _this.counter.nextColor()
+          }
         });
       });
-      this.timer.on('change:progress', function(timer, progress, obj) {
-        var count, idx;
-        _.each(_this.counts, function(count) {
-          return count.hide();
-        });
-        idx = parseInt(progress * 10);
-        count = _this.counts[idx];
-        return count.update((progress - 0.1 * idx) / 0.1);
+      this.backgrounder = new Backgrounder({
+        scene: this.scene,
+        camera: this.camera
       });
+      this.timer.on('change:progress', (function(model, value, obj) {
+        return this.backgrounder.update({
+          time: value
+        });
+      }), this);
+      this.counter.on('change:idx', this.backgrounder.randomize, this.backgrounder);
       return this.scene;
     };
 
     App.prototype.update = function() {
       var _this = this;
-      requestAnimationFrame(function() {
-        _this.update();
-        return _this.draw();
-      });
       if (this.get('paused') === true) {
         return;
       }
-      return this.trigger('update');
+      this.trigger('update');
+      return requestAnimationFrame(function() {
+        _this.update();
+        return _this.draw();
+      });
     };
 
     App.prototype.draw = function() {

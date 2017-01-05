@@ -24,7 +24,8 @@
       this.data = new function() {
         this.timeline = 0;
         this.loop = true;
-        return this.playing = true;
+        this.playing = true;
+        return this.duration = 10000;
       };
       folder = this.gui.addFolder('Animation');
       folder.open();
@@ -40,8 +41,13 @@
       });
       item = folder.add(this.data, 'loop');
       item.listen();
-      return item.onChange(function(val) {
+      item.onChange(function(val) {
         return _this.trigger('toggle-loop', val);
+      });
+      item = folder.add(this.data, 'duration', 0, 50000);
+      item.listen();
+      return item.onChange(function(val) {
+        return _this.trigger('duration', val);
       });
     };
 

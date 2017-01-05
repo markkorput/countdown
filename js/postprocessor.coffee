@@ -12,14 +12,35 @@ class @PostProcessor extends Backbone.Model
     @composer = new THREE.EffectComposer @renderer
     @composer.addPass new THREE.RenderPass( @scene, @camera )
     
-    @effect1 = new THREE.ShaderPass( THREE.DotScreenShader )
-    @effect1.uniforms[ 'scale' ].value = 4
-    @composer.addPass( @effect1 )
+    # @dotScreenEffect = new THREE.ShaderPass( THREE.DotScreenShader )
+    # @dotScreenEffect.uniforms[ 'scale' ].value = 4
+    # @composer.addPass( @dotScreenEffect )
+    # @on 'update', (model) ->
+    #     tmp = 150 + Math.sin((model.frame || 0.0)*0.1)*106
+    #     model.dotScreenEffect.uniforms.tSize.value = new THREE.Vector2(tmp,tmp)
 
-    @effect2 = new THREE.ShaderPass( THREE.RGBShiftShader )
-    @effect2.uniforms[ 'amount' ].value = 0.0015;
-    @effect2.renderToScreen = true
-    @composer.addPass @effect2
+    # @rgbShiftEffect = new THREE.ShaderPass( THREE.RGBShiftShader )
+    # @rgbShiftEffect.uniforms[ 'amount' ].value = 0.0015;
+    # # @rgbShiftEffect.renderToScreen = true
+    # @composer.addPass @rgbShiftEffect
+    # @on 'update', (model) ->
+    #     model.rgbShiftEffect.uniforms.amplitude.value = Math.sin(model.frame || 0.0) * 0.03
+
+    # @blindsEffect = new THREE.ShaderPass( THREE.BlindsShader )
+    # # @blindsEffect.renderToScreen = true
+    # @composer.addPass @blindsEffect
+    # @on 'update', (model, opts) ->
+    #     opts = opts.blinds || {}
+    #     model.blindsEffect.uniforms.progress.value = opts.progress || 0.0
+    #     model.blindsEffect.uniforms.color.value = opts.color || new THREE.Color(1.0, 0.0, 0.0)
+
+    @fadeEffect = new THREE.ShaderPass( THREE.FadeShader )
+    @fadeEffect.renderToScreen = true
+    @composer.addPass @fadeEffect
+    @on 'update', (model, opts) ->
+        opts = opts.fade || {}
+        model.fadeEffect.uniforms.progress.value = opts.progress || 0.0
+        model.fadeEffect.uniforms.color.value = opts.color || new THREE.Color(1.0, 0.0, 0.0)
 
   destroy: ->
     @trigger 'destroy'
@@ -27,13 +48,8 @@ class @PostProcessor extends Backbone.Model
     if @composer
       @composer = undefined
 
-    @scene = @camera = undefined
+    @dotScreenEffect = @rgbShiftEffect = @scene = @camera = undefined
 
-  update: ->
-    @frame ||= 0
-    @effect2.uniforms.amplitude.value = Math.sin(@frame) * 0.03
+  update: (opts) ->
+    @trigger 'update', this, opts
 
-    tmp = 150 + Math.sin(@frame*0.1)*106
-    @effect1.uniforms.tSize.value = new THREE.Vector2(tmp,tmp)
-
-    @frame += 0.05
